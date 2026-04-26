@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudio Lavalle & Asoc. — Solicitud de Trámites</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1a2744;--navy-mid:#243461;--blue:#2e5fac;--blue-light:#4a7fd4;--silver:#c8d4e8;--silver-light:#e8eef8;--gold:#c9a84c;--gold-light:#e8c870;--white:#f8faff;--text:#1a2744;--text-light:#5a6a8a;--success:#2d8a5e;--warning:#c17b2a;--error:#c0392b;--border:#d0daea;--shadow-lg:0 8px 40px rgba(26,39,68,.18)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center}
+header{width:100%;background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:20px 40px;display:flex;align-items:center;gap:18px;border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:100}
+.logo-mark{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:21px;color:var(--navy);font-weight:700;flex-shrink:0;box-shadow:0 2px 12px rgba(201,168,76,.4)}
+.header-text h1{font-family:'Playfair Display',serif;font-size:18px;color:#fff;font-weight:600}
+.header-text p{font-size:11px;color:var(--silver);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.header-badge{margin-left:auto;background:rgba(201,168,76,.15);border:1px solid var(--gold);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;font-weight:600}
+.pedido-bar{width:100%;max-width:820px;margin:16px auto 0;padding:0 20px}
+.pedido-info{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:11px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gold);flex-wrap:wrap}
+.pedido-info strong{color:#fff}
+.pedido-count{margin-left:auto;background:var(--gold);color:var(--navy);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+main{width:100%;max-width:820px;padding:22px 20px 80px}
+.progress-wrap{display:flex;align-items:center;margin-bottom:26px}
+.step-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.step-item:not(:last-child)::after{content:'';position:absolute;top:15px;left:50%;width:100%;height:2px;background:rgba(200,212,232,.2);z-index:0;transition:background .4s}
+.step-item.done:not(:last-child)::after{background:var(--gold)}
+.step-circle{width:30px;height:30px;border-radius:50%;background:rgba(200,212,232,.15);color:var(--silver);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;position:relative;z-index:1;transition:all .3s;border:2px solid transparent}
+.step-item.active .step-circle{background:var(--blue);color:#fff;border-color:var(--blue-light);box-shadow:0 0 0 4px rgba(46,95,172,.22)}
+.step-item.done .step-circle{background:var(--gold);color:var(--navy);border-color:var(--gold-light)}
+.step-label{font-size:9px;color:rgba(200,212,232,.45);margin-top:5px;text-align:center;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+.step-item.active .step-label{color:var(--blue-light)}
+.step-item.done .step-label{color:var(--gold)}
+.card{background:var(--white);border-radius:20px;padding:34px;box-shadow:var(--shadow-lg);animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card-title{font-family:'Playfair Display',serif;font-size:21px;color:var(--navy);margin-bottom:4px}
+.card-subtitle{font-size:13px;color:var(--text-light);margin-bottom:26px;line-height:1.6}
+.section-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.option-grid{display:grid;gap:12px}
+.option-grid.cols-2{grid-template-columns:1fr 1fr}
+.option-card{border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;background:#fff;text-align:center;user-select:none}
+.option-card:hover{border-color:var(--blue-light);background:var(--silver-light);transform:translateY(-2px)}
+.option-card.selected{border-color:var(--blue);background:rgba(46,95,172,.06);transform:translateY(-2px);box-shadow:0 4px 16px rgba(46,95,172,.12)}
+.option-card .icon{font-size:24px;margin-bottom:7px}
+.option-card .name{font-size:13px;font-weight:700;color:var(--navy)}
+.option-card .desc{font-size:11px;color:var(--text-light);margin-top:3px;line-height:1.4}
+.option-card.selected .name{color:var(--blue)}
+.pill-grid{display:flex;flex-wrap:wrap;gap:10px}
+.pill{border:1.5px solid var(--border);border-radius:30px;padding:9px 20px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-light);background:#fff;transition:all .2s;user-select:none}
+.pill:hover{border-color:var(--blue-light);color:var(--blue);background:var(--silver-light)}
+.pill.selected{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(46,95,172,.25)}
+.char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.char-card{border:2px solid var(--border);border-radius:14px;padding:20px 12px;cursor:pointer;transition:all .2s;text-align:center;user-select:none;background:#fff}
+.char-card:hover{border-color:var(--blue-light);transform:translateY(-2px)}
+.char-card.selected{border-color:var(--gold);background:rgba(201,168,76,.07);transform:translateY(-2px);box-shadow:0 4px 14px rgba(201,168,76,.18)}
+.char-card .char-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.char-card .char-price{font-size:22px;font-weight:700;color:var(--blue)}
+.char-card .char-currency{font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.char-card.selected .char-name{color:var(--gold)}
+.char-card.selected .char-price{color:var(--navy)}
+.form-grid{display:grid;gap:14px}
+.form-grid.cols-2{grid-template-columns:1fr 1fr}
+.form-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.2px}
+.field .hint{font-size:11px;color:var(--text-light);line-height:1.4;margin-top:2px}
+.field input,.field select,.field textarea{border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:#fff;transition:border-color .2s,box-shadow .2s;outline:none;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,95,172,.1)}
+.field textarea{resize:vertical;min-height:70px}
+.field.required label::after{content:' *';color:var(--error)}
+/* MATRICULA VISUAL */
+.mat-wrap{background:var(--silver-light);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px}
+.mat-row{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
+.mat-field{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mat-field label{font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.4px}
+.mat-field input{border:1.5px solid var(--border);border-radius:8px;padding:9px 10px;font-size:15px;font-weight:600;text-align:center;width:90px;outline:none;background:#fff;font-family:'DM Sans',sans-serif}
+.mat-field input.wide{width:130px}
+.mat-field input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(46,95,172,.1)}
+.mat-sep{font-size:22px;font-weight:700;color:var(--text-light);padding-bottom:8px}
+.mat-sep.slash{color:var(--blue)}
+.toggle-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--silver-light);border-radius:10px;cursor:pointer;user-select:none;border:1.5px solid var(--border)}
+.toggle-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.toggle-row label{font-size:13px;font-weight:500;color:var(--navy);cursor:pointer;line-height:1.4}
+.alert{padding:12px 15px;border-radius:10px;font-size:13px;line-height:1.5;display:flex;gap:10px;align-items:flex-start;margin-bottom:14px}
+.alert.warning{background:#fff8ec;border-left:4px solid var(--warning);color:#7a4e0d}
+.alert.info{background:#eef4ff;border-left:4px solid var(--blue);color:var(--navy-mid)}
+.repeater{display:flex;flex-direction:column;gap:10px}
+.repeater-item{border:1.5px solid var(--border);border-radius:12px;padding:15px;background:var(--silver-light);position:relative}
+.remove-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--error);cursor:pointer;font-size:18px;padding:2px 8px;border-radius:6px;transition:background .2s}
+.remove-btn:hover{background:rgba(192,57,43,.1)}
+.add-btn{border:1.5px dashed var(--blue-light);border-radius:10px;padding:10px;background:none;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:all .2s;font-family:'DM Sans',sans-serif;margin-top:10px}
+.add-btn:hover{background:rgba(46,95,172,.06)}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.nc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px}
+.nc-field{display:flex;flex-direction:column;gap:3px}
+.nc-field label{font-size:10px;font-weight:700;color:var(--text-light);letter-spacing:.4px;text-transform:uppercase}
+.nc-field input{border:1.5px solid var(--border);border-radius:8px;padding:8px 9px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif}
+.nc-field input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(46,95,172,.1)}
+.tramite-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.tc-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.tc-info{flex:1}
+.tc-title{font-size:13px;font-weight:700;color:var(--navy)}
+.tc-sub{font-size:11px;color:var(--text-light);margin-top:2px}
+.tc-price{font-size:15px;font-weight:700;color:var(--blue)}
+.nav-row{display:flex;justify-content:space-between;margin-top:28px;gap:12px}
+.btn{padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .2s;letter-spacing:.2px}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-light));color:#fff;box-shadow:0 4px 14px rgba(46,95,172,.32)}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,95,172,.42)}
+.btn-secondary{background:var(--silver-light);color:var(--navy);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--silver)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);box-shadow:0 4px 14px rgba(201,168,76,.32)}
+.btn-gold:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,.42)}
+.btn-success{background:linear-gradient(135deg,#2d8a5e,#3aad77);color:#fff;box-shadow:0 4px 14px rgba(45,138,94,.32)}
+.btn-success:hover:not(:disabled){transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.total-bar{background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:14px;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;color:#fff}
+.total-label{font-size:11px;color:var(--silver);text-transform:uppercase;letter-spacing:1px}
+.total-amount{font-size:24px;font-weight:700;color:var(--gold)}
+.resumen-box{background:var(--navy);border-radius:16px;padding:22px;color:#fff;margin-bottom:14px}
+.resumen-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.3)}
+.resumen-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:12px}
+.resumen-row:last-child{border-bottom:none}
+.resumen-key{color:var(--silver);min-width:150px;font-weight:500}
+.resumen-val{color:#fff;font-weight:600;flex:1}
+.resumen-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:13px 0 6px;font-weight:700}
+.resumen-tramite-block{background:rgba(255,255,255,.05);border-radius:10px;padding:13px;margin-bottom:8px;border-left:3px solid var(--gold)}
+.copy-area{background:#0d1629;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:11.5px;color:#a8c4ff;white-space:pre-wrap;line-height:1.7;margin-bottom:12px;border:1px solid rgba(255,255,255,.1);max-height:260px;overflow-y:auto}
+.client-note{font-size:11px;color:var(--text-light);margin-top:6px;line-height:1.5;font-style:italic;padding:8px 12px;background:var(--silver-light);border-radius:8px;border-left:3px solid var(--blue-light)}
+.file-upload{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#fff}
+.file-upload:hover{border-color:var(--blue-light);background:var(--silver-light)}
+.file-upload input{display:none}
+.file-upload .fu-icon{font-size:24px;margin-bottom:6px}
+.file-upload .fu-text{font-size:13px;color:var(--text-light)}
+.file-upload .fu-name{font-size:12px;color:var(--success);font-weight:600;margin-top:4px}
+.hidden{display:none!important}
+@media(max-width:600px){.form-grid.cols-2,.form-grid.cols-3{grid-template-columns:1fr}.option-grid.cols-2{grid-template-columns:1fr 1fr}.char-grid{grid-template-columns:1fr}.card{padding:20px 15px}header{padding:15px 18px}.nc-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-mark">L</div>
+  <div class="header-text">
+    <h1>Estudio Lavalle & Asoc.</h1>
+    <p>Solicitud de trámites registrales</p>
+  </div>
+  <div class="header-badge">Formulario de pedido</div>
+</header>
+
+<div class="pedido-bar hidden" id="pedidoBar">
+  <div class="pedido-info">
+    <span>📋 Pedido activo — <strong id="barCliente"></strong></span>
+    <span style="color:var(--silver);font-size:12px" id="barOrg"></span>
+    <span class="pedido-count" id="barCount">0 trámites</span>
+  </div>
+</div>
+
+<main>
+  <div class="progress-wrap" id="progressBar">
+    <div class="step-item active" id="si1"><div class="step-circle">1</div><div class="step-label">Cliente</div></div>
+    <div class="step-item" id="si2"><div class="step-circle">2</div><div class="step-label">Organismo</div></div>
+    <div class="step-item" id="si3"><div class="step-circle">3</div><div class="step-label">Trámite</div></div>
+    <div class="step-item" id="si4"><div class="step-circle">4</div><div class="step-label">Carácter</div></div>
+    <div class="step-item" id="si5"><div class="step-circle">5</div><div class="step-label">Datos</div></div>
+    <div class="step-item" id="si6"><div class="step-circle">✓</div><div class="step-label">Resumen</div></div>
+  </div>
+
+  <!-- STEP 1: CLIENTE -->
+  <div class="card" id="step1">
+    <div class="card-title">Datos del solicitante</div>
+    <div class="card-subtitle">Completá tus datos para identificar el pedido. Solo se cargan una vez por sesión.</div>
+    <div class="section-label">Tipo de cliente</div>
+    <div class="option-grid cols-2" style="margin-bottom:20px">
+      <div class="option-card" onclick="selTipoCliente('particular',this)"><div class="icon">👤</div><div class="name">Persona Particular</div></div>
+      <div class="option-card" onclick="selTipoCliente('agente',this)"><div class="icon">🏠</div><div class="name">Agente Inmobiliario</div></div>
+      <div class="option-card" onclick="selTipoCliente('inmobiliaria',this)"><div class="icon">🏢</div><div class="name">Inmobiliaria</div></div>
+      <div class="option-card" onclick="selTipoCliente('estudio',this)"><div class="icon">⚖️</div><div class="name">Estudio Jurídico</div></div>
+    </div>
+    <div class="section-label">Datos personales</div>
+    <div class="form-grid cols-2" style="margin-bottom:12px">
+      <div class="field required"><label>Apellido</label>
+        <input type="text" id="c_ap" list="dl_ap" placeholder="Ej: González" oninput="autocomplete()">
+        <datalist id="dl_ap"></datalist>
+      </div>
+      <div class="field required"><label>Nombre/s</label><input type="text" id="c_nom" placeholder="Ej: Claudio Martín"></div>
+    </div>
+    <div class="hidden" id="campo_emp">
+      <div class="field required" style="margin-bottom:12px">
+        <label id="lbl_emp">Inmobiliaria / Empresa</label>
+        <input type="text" id="c_emp" list="dl_emp" placeholder="Ej: RE/MAX Express">
+        <datalist id="dl_emp"></datalist>
+      </div>
+    </div>
+    <div class="form-grid cols-2" style="margin-bottom:8px">
+      <div class="field"><label>WhatsApp / Teléfono</label><input type="text" id="c_tel" placeholder="Ej: 1155667788"></div>
+      <div class="field"><label>Mail</label><input type="email" id="c_mail" placeholder="Ej: correo@gmail.com"></div>
+    </div>
+    <div class="client-note">💡 <strong>Primera vez:</strong> ingresá tu apellido y completá todos los campos. En futuros pedidos, comenzá a escribir tu apellido y tus datos aparecerán automáticamente. Esto funciona en el mismo dispositivo y navegador.</div>
+    <div class="nav-row"><div></div><button class="btn btn-primary" onclick="confirmarCliente()">Continuar →</button></div>
+  </div>
+
+  <!-- STEP 2: ORGANISMO -->
+  <div class="card hidden" id="step2">
+    <div class="card-title">Seleccionar Organismo</div>
+    <div class="card-subtitle">Elegí el organismo del pedido. <strong>Todos los trámites de este pedido serán en este organismo.</strong></div>
+    <div class="option-grid cols-2">
+      <div class="option-card" onclick="selOrg('RPI-CABA',this)"><div class="icon">🏛️</div><div class="name">RPI — CABA</div><div class="desc">Registro de la Propiedad Inmueble<br>Capital Federal</div></div>
+      <div class="option-card" onclick="selOrg('RPI-PBA',this)"><div class="icon">🏢</div><div class="name">RPI — Provincia</div><div class="desc">Registro de la Propiedad Inmueble<br>Provincia de Buenos Aires</div></div>
+      <div class="option-card" onclick="selOrg('Catastro GCBA',this)"><div class="icon">🗺️</div><div class="name">Catastro GCBA</div><div class="desc">Gobierno de la Ciudad<br>de Buenos Aires</div></div>
+      <div class="option-card" onclick="selOrg('ARBA',this)"><div class="icon">📋</div><div class="name">ARBA</div><div class="desc">Agencia de Recaudación<br>Provincia de Buenos Aires</div></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Volver</button>
+      <button class="btn btn-primary" id="btn2" onclick="goStep(3)" disabled>Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: TIPO -->
+  <div class="card hidden" id="step3">
+    <div class="card-title">Tipo de Trámite</div>
+    <div class="card-subtitle" id="sub3"></div>
+    <div class="pill-grid" id="pills3"></div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" id="back3" onclick="goStep(2)">← Volver</button>
+      <button class="btn btn-primary" id="btn3" onclick="goStep(4)" disabled>Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: CARACTER -->
+  <div class="card hidden" id="step4">
+    <div class="card-title">Carácter del Trámite</div>
+    <div class="card-subtitle">Seleccioná la modalidad.</div>
+    <div class="char-grid" id="chars4"></div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goStep(3)">← Volver</button>
+      <button class="btn btn-primary" id="btn4" onclick="goStep(5)" disabled>Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: DATOS -->
+  <div class="card hidden" id="step5">
+    <div class="card-title">Datos del Trámite</div>
+    <div class="card-subtitle" id="sub5"></div>
+    <div id="form5"></div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goStep(4)">← Volver</button>
+      <button class="btn btn-gold" onclick="agregarTramite()">Agregar al pedido →</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: RESUMEN -->
+  <div class="card hidden" id="step6">
+    <div class="card-title">Resumen del Pedido</div>
+    <div class="card-subtitle" id="sub6"></div>
+    <div class="section-label">Trámites cargados</div>
+    <div id="lista6"></div>
+    <div class="total-bar" id="totalBar"></div>
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="agregarOtro()" style="flex:1">+ Agregar otro trámite</button>
+      <button class="btn btn-success" onclick="confirmarPedido()" style="flex:1">✅ Confirmar pedido</button>
+    </div>
+    <div class="hidden" id="resConfirmado">
+      <div class="section-label">Datos para ingresar en el organismo</div>
+      <div class="resumen-box" id="resBox"></div>
+      <div class="copy-area" id="copyArea"></div>
+      <div style="background:linear-gradient(135deg,#1a2744,#243461);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center">
+        <div style="font-size:13px;color:#c8d4e8;margin-bottom:12px;line-height:1.5">📨 <strong style="color:#fff">Enviá el pedido al Estudio</strong><br>Hacé clic en el botón para abrir tu correo con los datos del pedido ya cargados, listos para enviar.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-success" onclick="enviarMail()" style="flex:1;font-size:14px;padding:14px">✉️ Enviar por mail</button>
+          <button class="btn" onclick="enviarWhatsApp()" style="flex:1;font-size:14px;padding:14px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 4px 14px rgba(37,211,102,.35)">📱 Enviar por WhatsApp</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="copiar()" style="flex:1">📋 Copiar datos</button>
+        <button class="btn btn-primary" onclick="descargarCSV()" style="flex:1">⬇️ Descargar para Excel</button>
+        <button class="btn btn-secondary" onclick="nuevoPedido()" style="flex:1">+ Nuevo pedido</button>
+      </div>
+    </div>
+    <div class="nav-row"><button class="btn btn-secondary" onclick="goStep(5)">← Editar último trámite</button></div>
+  </div>
+</main>
+
+<script>
+// ============================================================
+// PRECIOS CORREGIDOS
+// ============================================================
+const PRECIOS = {
+  'RPI-CABA':{
+    'Dominio':                   {Simple:[6000,9000],Urgente:[18000,22000],'Urgente Express':[30000,35000]},
+    'Inhibición':                {Simple:[3000,6000],Urgente:[9000,13000],'Urgente Express':[27000,33000]},
+    'Frecuencia':                {Simple:[3000,6000]},
+    'Índice de Titularidad':     {Simple:[3000,6000],Urgente:[12000,16000]},
+    'INFO 6 / Mat. y Gravámenes':{Simple:[9000,12000]},
+  },
+  'RPI-PBA':{
+    'Dominio':                   {Simple:[22300,29000],Urgente:[62800,71500],'Urgente Express':[124900,135000]},
+    'Inhibición':                {Simple:[22300,29000],Urgente:[62800,71500],'Urgente Express':[124900,135000]},
+    'Cesión':                    {Simple:[22300,29000],Urgente:[62800,71500],'Urgente Express':[124900,135000]},
+    'Frecuencia':                {Simple:[20400,29000]},
+    'Copia Asiento Registral':   {Simple:[20400,29000],Urgente:[52200,71500],'Urgente Express':[114300,135000]},
+    'Índice de Titularidad':     {Simple:[20400,29000],Urgente:[52200,65000],'Urgente Express':[114300,130000]},
+  },
+  'Catastro GCBA':{'Planos':{Simple:[0,7000]},'Cert. Info. Registral':{Simple:[0,0]}},
+  'ARBA':{'Planos PH':{Simple:[3658,10000]}},
+};
+
+const PARTIDOS=['001-Adolfo Alsina','002-Alberti','003-Almirante Brown','004-Avellaneda','005-Ayacucho','006-Azul','007-Bahía Blanca','008-Balcarce','009-Baradero','010-Arrecifes','011-Bolívar','012-Bragado','013-Cnel. Brandsen','014-Campana','015-Cañuelas','016-Carlos Casares','017-Carlos Tejedor','018-Carmen de Areco','019-Daireaux','020-Castelli','021-Colón','022-Cnel. Dorrego','023-Cnel. Pringles','024-Cnel. Suárez','025-Lanús','026-Chacabuco','027-Chascomús','028-Chivilcoy','029-Dolores','030-Esteban Echeverría','031-Exaltación de la Cruz','032-Florencio Varela','033-Gral. Alvarado','034-Gral. Alvear','035-Gral. Arenales','036-Gral. Belgrano','037-Gral. Guido','038-Zárate','039-Gral. Madariaga','040-Gral. Lamadrid','041-Gral. Las Heras','042-Gral. Lavalle','043-Gral. Paz','044-Gral. Pinto','045-Gral. Pueyrredón','046-Gral. Rodríguez','047-Gral. San Martín','048-Gral. Sarmiento','049-Gral. Viamonte','050-Gral. Villegas','051-Adolfo G. Chaves','052-Guaminí','053-Benito Juárez','054-Junín','055-La Plata','056-Laprida','057-Tigre','058-Las Flores','059-Leandro N. Alem','060-Lincoln','061-Lobería','062-Lobos','063-Lomas de Zamora','064-Luján','065-Magdalena','066-Maipú','067-Salto','068-Marcos Paz','069-Mar Chiquita','070-La Matanza','071-Mercedes','072-Merlo','073-Monte','074-Moreno','075-Navarro','076-Necochea','077-Nueve de Julio','078-Olavarría','079-Patagones','080-Pehuajó','081-Pellegrini','082-Pergamino','083-Pila','084-Pilar','085-Puán','086-Quilmes','087-Ramallo','088-Rauch','089-Rivadavia','090-Rojas','091-Roque Pérez','092-Saavedra','093-Saladillo','094-San Andrés de Giles','095-San Antonio de Areco','096-San Fernando','097-San Isidro','098-San Nicolás','099-San Pedro','100-San Vicente','101-Morón','102-Suipacha','103-Tandil','104-Tapalqué','105-Tordillo','106-Tornquist','107-Trenque Lauquen','108-Tres Arroyos','109-Veinticinco de Mayo','110-Vicente López','111-Villarino','112-Islas','113-Cnel. Rosales','114-Berisso','115-Ensenada','116-San Cayetano','117-Tres de Febrero','118-Escobar','119-Hipólito Yrigoyen','120-Berazategui','121-Capitán Sarmiento','122-Salliqueló','123-De la Costa','124-Pinamar','125-Villa Gesell','126-Monte Hermoso','127-Tres Lomas','128-Florentino Ameghino','129-Presidente Perón','130-Ezeiza','131-San Miguel','132-José C. Paz','133-Malvinas Argentinas','134-Punta Indio','135-Hurlingham','136-Ituzaingó','137-Lezama'];
+
+// ============================================================
+// STATE
+// ============================================================
+let S={cliente:{tipo:'',ap:'',nom:'',emp:'',tel:'',mail:''},org:'',tipo:'',caracter:'',tramites:[],archivos:{}};
+let ctr={tit:0,inh:0,pInh:0};
+
+// ============================================================
+// LOCAL STORAGE
+// ============================================================
+function saveCliente(c){
+  let list=JSON.parse(localStorage.getItem('lv_cl')||'[]');
+  const i=list.findIndex(x=>x.ap.toLowerCase()===c.ap.toLowerCase()&&x.nom.toLowerCase()===c.nom.toLowerCase());
+  if(i>=0)list[i]=c;else list.push(c);
+  localStorage.setItem('lv_cl',JSON.stringify(list));
+  buildDatalist();
+}
+function buildDatalist(){
+  const list=JSON.parse(localStorage.getItem('lv_cl')||'[]');
+  document.getElementById('dl_ap').innerHTML=list.map(c=>`<option value="${c.ap}">${c.ap}, ${c.nom}${c.emp?' — '+c.emp:''}</option>`).join('');
+  const emps=[...new Set(list.filter(c=>c.emp).map(c=>c.emp))];
+  document.getElementById('dl_emp').innerHTML=emps.map(e=>`<option value="${e}">`).join('');
+}
+function autocomplete(){
+  const ap=document.getElementById('c_ap').value.trim();
+  if(!ap)return;
+  const list=JSON.parse(localStorage.getItem('lv_cl')||'[]');
+  const m=list.find(c=>c.ap.toLowerCase()===ap.toLowerCase());
+  if(!m)return;
+  document.getElementById('c_nom').value=m.nom||'';
+  document.getElementById('c_tel').value=m.tel||'';
+  document.getElementById('c_mail').value=m.mail||'';
+  if(m.emp){
+    const empEl=document.getElementById('c_emp');
+    if(empEl)empEl.value=m.emp;
+  }
+  if(m.tipo){
+    // Find the option card by data in onclick attribute safely
+    const cards=document.querySelectorAll('#step1 .option-card');
+    cards.forEach(card=>{
+      const fn=card.getAttribute('onclick')||'';
+      if(fn.includes("'"+m.tipo+"'")){
+        selTipoCliente(m.tipo,card);
+      }
+    });
+  }
+}
+buildDatalist();
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goStep(n){
+  [1,2,3,4,5,6].forEach(i=>{
+    document.getElementById('step'+i).classList.add('hidden');
+    const s=document.getElementById('si'+i);
+    if(s)s.className='step-item'+(i<n?' done':i===n?' active':'');
+  });
+  document.getElementById('step'+n).classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===3)buildStep3();
+  if(n===4)buildStep4();
+  if(n===5)buildStep5();
+  if(n===6)buildStep6();
+}
+
+// ============================================================
+// STEP 1
+// ============================================================
+function selTipoCliente(tipo,el){
+  S.cliente.tipo=tipo;
+  document.querySelectorAll('#step1 .option-card').forEach(c=>c.classList.remove('selected'));
+  if(el)el.classList.add('selected');
+  const emp=document.getElementById('campo_emp');
+  const lbl=document.getElementById('lbl_emp');
+  if(tipo==='agente'||tipo==='inmobiliaria'||tipo==='estudio'){
+    emp.classList.remove('hidden');
+    lbl.textContent=tipo==='agente'?'Inmobiliaria / Red':tipo==='estudio'?'Nombre del Estudio':'Nombre de la Inmobiliaria';
+  }else emp.classList.add('hidden');
+}
+function confirmarCliente(){
+  const ap=document.getElementById('c_ap').value.trim();
+  const nom=document.getElementById('c_nom').value.trim();
+  if(!ap||!nom){alert('Por favor completá apellido y nombre.');return;}
+  S.cliente={tipo:S.cliente.tipo||'particular',ap,nom,
+    emp:document.getElementById('c_emp')?.value.trim()||'',
+    tel:document.getElementById('c_tel').value.trim(),
+    mail:document.getElementById('c_mail').value.trim()};
+  saveCliente(S.cliente);
+  goStep(2);
+}
+
+// ============================================================
+// STEP 2
+// ============================================================
+function selOrg(org,el){
+  // Only allow changing org if no tramites yet
+  if(S.tramites.length>0&&S.org!==org){
+    alert(`Este pedido ya tiene trámites en ${S.org}. Para cambiar de organismo, confirmá el pedido actual e iniciá uno nuevo.`);
+    return;
+  }
+  S.org=org;S.tipo='';S.caracter='';
+  document.querySelectorAll('#step2 .option-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn2').disabled=false;
+}
+
+// ============================================================
+// STEP 3
+// ============================================================
+function buildStep3(){
+  const subs={'RPI-CABA':'Trámites ante el Registro de la Propiedad Inmueble — Capital Federal.','RPI-PBA':'Trámites ante el Registro de la Propiedad Inmueble — Provincia de Buenos Aires.','Catastro GCBA':'Trámites ante Catastro del Gobierno de la Ciudad.','ARBA':'Trámites ante la Agencia de Recaudación de la Provincia de Buenos Aires.'};
+  document.getElementById('sub3').textContent=subs[S.org]||'';
+  const tipos=Object.keys(PRECIOS[S.org]);
+  const c=document.getElementById('pills3');c.innerHTML='';
+  tipos.forEach(t=>{
+    const p=document.createElement('div');p.className='pill'+(S.tipo===t?' selected':'');p.textContent=t;
+    p.onclick=()=>{S.tipo=t;S.caracter='';document.querySelectorAll('.pill').forEach(x=>x.classList.remove('selected'));p.classList.add('selected');document.getElementById('btn3').disabled=false;};
+    c.appendChild(p);
+  });
+  document.getElementById('btn3').disabled=!S.tipo;
+  // When adding another tramite, disable back to step 2 (org is fixed)
+  const back=document.getElementById('back3');
+  if(S.tramites.length>0){back.textContent='← Volver al resumen';back.onclick=()=>goStep(6);}
+  else{back.textContent='← Volver';back.onclick=()=>goStep(2);}
+}
+
+// ============================================================
+// STEP 4
+// ============================================================
+function buildStep4(){
+  const chars=PRECIOS[S.org][S.tipo];
+  const c=document.getElementById('chars4');c.innerHTML='';
+  Object.entries(chars).forEach(([car,[,importe]])=>{
+    const card=document.createElement('div');card.className='char-card'+(S.caracter===car?' selected':'');
+    card.innerHTML=`<div class="char-name">${car}</div><div class="char-price">$${importe.toLocaleString('es-AR')}</div><div class="char-currency">precio total</div>`;
+    card.onclick=()=>{S.caracter=car;document.querySelectorAll('.char-card').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');document.getElementById('btn4').disabled=false;};
+    c.appendChild(card);
+  });
+  document.getElementById('btn4').disabled=!S.caracter;
+}
+
+// ============================================================
+// STEP 5 — FORMS
+// ============================================================
+function buildStep5(){
+  document.getElementById('sub5').textContent=`${S.org} — ${S.tipo} — ${S.caracter}`;
+  const c=document.getElementById('form5');c.innerHTML='';
+  ctr={tit:0,inh:0,pInh:0};
+  const o=S.org,t=S.tipo;
+  if(o==='RPI-CABA'){
+    if(t==='Dominio')fDominioCABA(c);
+    else if(t==='Inhibición')fInhCABA(c);
+    else if(t==='Frecuencia')fFrecCABA(c);
+    else if(t==='Índice de Titularidad')fIdxCABA(c);
+    else if(t==='INFO 6 / Mat. y Gravámenes')fInfo6(c);
+  }
+  if(o==='RPI-PBA'){
+    if(t==='Dominio')fDomPBA(c);
+    else if(t==='Inhibición'||t==='Cesión')fInhPBA(c);
+    else if(t==='Frecuencia')fFrecPBA(c);
+    else if(t==='Copia Asiento Registral')fCopiaAsientoPBA(c);
+    else if(t==='Índice de Titularidad')fIdxPBA(c);
+  }
+  if(o==='Catastro GCBA'&&t==='Planos')fPlanosGCBA(c);
+  if(o==='ARBA'&&t==='Planos PH')fPlanosARBA(c);
+}
+
+// ---- HELPERS ----
+const gv=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
+const gc=id=>{const e=document.getElementById(id);return e&&e.checked};
+
+function matVisual(pfx,showUF=true,label='Matrícula (Folio Real)'){
+  return `<div style="margin-bottom:10px">
+  <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:8px">${label}</label>
+  <div class="mat-wrap">
+    <div class="mat-row">
+      <div class="mat-field"><label>Circ.</label><input type="text" id="${pfx}_c" placeholder="Ej: 5"></div>
+      <div class="mat-sep">-</div>
+      <div class="mat-field"><label>Matrícula</label><input type="text" id="${pfx}_m" class="wide" placeholder="Ej: 2456"></div>
+      ${showUF?`<div class="mat-sep slash" id="${pfx}_sl" style="display:none">/</div>
+      <div class="mat-field" id="${pfx}_ufb" style="display:none"><label>UF</label><input type="text" id="${pfx}_uf" placeholder="Ej: 7"></div>`:''}
+    </div>
+  </div>
+  ${showUF?`<div class="toggle-row" style="margin-top:8px">
+    <input type="checkbox" id="${pfx}_finca" checked onchange="toggleUF('${pfx}')">
+    <label for="${pfx}_finca">Es Finca — sin Propiedad Horizontal (destildá si tiene Unidad Funcional)</label>
+  </div>`:''}
+  </div>`;
+}
+
+function matPBA(pfx){
+  // PBA: solo Matricula (sin circunscripcion) + UF/UC
+  return `<div style="margin-bottom:10px">
+  <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:8px">Matrícula</label>
+  <div class="mat-wrap">
+    <div class="mat-row">
+      <div class="mat-field"><label>Nro. Matrícula</label><input type="text" id="${pfx}_m" class="wide" placeholder="Ej: 45678"></div>
+      <div class="mat-sep slash" id="${pfx}_sl" style="display:none">/</div>
+      <div class="mat-field" id="${pfx}_ufb" style="display:none">
+        <label id="${pfx}_uflbl">UF / UC</label>
+        <input type="text" id="${pfx}_uf" placeholder="Ej: 7">
+      </div>
+    </div>
+  </div>
+  <div class="toggle-row" style="margin-top:8px">
+    <input type="checkbox" id="${pfx}_finca" checked onchange="toggleUFPBA('${pfx}')">
+    <label for="${pfx}_finca">Es Finca — sin Propiedad Horizontal (destildá si tiene Unidad Funcional / Complementaria)</label>
+  </div>
+  </div>`;
+}
+
+function toggleUF(pfx){
+  const f=gc(`${pfx}_finca`);
+  const sl=document.getElementById(`${pfx}_sl`);
+  const ub=document.getElementById(`${pfx}_ufb`);
+  if(sl)sl.style.display=f?'none':'flex';
+  if(ub)ub.style.display=f?'none':'flex';
+}
+
+function toggleUFPBA(pfx){
+  const f=gc(`${pfx}_finca`);
+  document.getElementById(`${pfx}_sl`).style.display=f?'none':'flex';
+  document.getElementById(`${pfx}_ufb`).style.display=f?'none':'flex';
+}
+
+function ncBlock(pfx){
+  return `<div class="section-label" style="margin-top:10px">Nomenclatura Catastral <span style="color:var(--error);font-size:11px">* obligatoria</span></div>
+  <div class="nc-grid">
+    <div class="nc-field"><label>C (Circ.)</label><input type="text" id="${pfx}_c"></div>
+    <div class="nc-field"><label>S (Secc.)</label><input type="text" id="${pfx}_s"></div>
+    <div class="nc-field"><label>Ch Nro</label><input type="text" id="${pfx}_chn"></div>
+    <div class="nc-field"><label>Ch Letra</label><input type="text" id="${pfx}_chl"></div>
+    <div class="nc-field"><label>Qta Nro</label><input type="text" id="${pfx}_qn"></div>
+    <div class="nc-field"><label>Qta Letra</label><input type="text" id="${pfx}_ql"></div>
+    <div class="nc-field"><label>F Nro</label><input type="text" id="${pfx}_fn"></div>
+    <div class="nc-field"><label>F Letra</label><input type="text" id="${pfx}_fl"></div>
+    <div class="nc-field"><label>M (Manz.) Nro</label><input type="text" id="${pfx}_mn"></div>
+    <div class="nc-field"><label>M Letra</label><input type="text" id="${pfx}_ml"></div>
+    <div class="nc-field"><label>P (Parc.) Nro</label><input type="text" id="${pfx}_pn"></div>
+    <div class="nc-field"><label>SP (Subp.)</label><input type="text" id="${pfx}_sp"></div>
+  </div>`;
+}
+
+function ncVal(pfx){
+  const parts=[
+    gv(`${pfx}_c`)?`C:${gv(`${pfx}_c`)}` :'',
+    gv(`${pfx}_s`)?`S:${gv(`${pfx}_s`)}` :'',
+    (gv(`${pfx}_chn`)||gv(`${pfx}_chl`))?`Ch:${gv(`${pfx}_chn`)}${gv(`${pfx}_chl`)}`:'',
+    (gv(`${pfx}_qn`)||gv(`${pfx}_ql`))?`Qta:${gv(`${pfx}_qn`)}${gv(`${pfx}_ql`)}`:'',
+    (gv(`${pfx}_fn`)||gv(`${pfx}_fl`))?`F:${gv(`${pfx}_fn`)}${gv(`${pfx}_fl`)}`:'',
+    (gv(`${pfx}_mn`)||gv(`${pfx}_ml`))?`M:${gv(`${pfx}_mn`)}${gv(`${pfx}_ml`)}`:'',
+    gv(`${pfx}_pn`)?`P:${gv(`${pfx}_pn`)}` :'',
+    gv(`${pfx}_sp`)?`SP:${gv(`${pfx}_sp`)}` :'',
+  ];
+  return parts.filter(Boolean).join(' ');
+}
+
+function pSel(id){return `<select id="${id}">${PARTIDOS.map(p=>`<option value="${p}">${p}</option>`).join('')}</select>`;}
+
+function fileUpload(id,label='Adjuntar escritura / título (PDF)'){
+  return `<div style="margin-top:14px">
+  <label style="font-size:12px;font-weight:700;color:var(--navy);display:block;margin-bottom:8px">${label}</label>
+  <div class="file-upload" onclick="document.getElementById('${id}').click()">
+    <input type="file" id="${id}" accept=".pdf" onchange="showFile('${id}')">
+    <div class="fu-icon">📎</div>
+    <div class="fu-text">Hacé clic para adjuntar el PDF</div>
+    <div class="fu-name" id="${id}_name"></div>
+  </div>
+  </div>`;
+}
+
+function showFile(id){
+  const f=document.getElementById(id).files[0];
+  if(f){document.getElementById(id+'_name').textContent='✅ '+f.name;S.archivos[id]=f.name;}
+}
+
+// ============================================================
+// CABA FORMS
+// ============================================================
+function fDominioCABA(c){
+  c.innerHTML=`
+  <div class="section-label">Sistema registral</div>
+  <div class="form-grid cols-2" style="margin-bottom:16px">
+    <div class="field required"><label>Tipo de registración</label>
+      <select id="f_sist" onchange="toggleSistCABA()">
+        <option value="">Seleccionar...</option>
+        <option value="mat">Matrícula (Folio Real) — sistema actual</option>
+        <option value="folio">Tomo y Folio — sistema antiguo (hasta ~1980)</option>
+      </select>
+    </div>
+  </div>
+  <div id="blk_mat" class="hidden">
+    <div class="field required" style="margin-bottom:12px"><label>Dirección del inmueble</label>
+      <input type="text" id="f_dir" placeholder="Ej: Moreno 467 · Moreno 467/71 · Av. Corrientes 1234 Piso 3 Dpto F">
+      <div class="hint">Podés ingresar múltiples numeraciones: Moreno 467 469 471 o Moreno 467/71. Para PH agregá Piso y Departamento.</div>
+    </div>
+    ${matVisual('dm')}
+    <div class="divider"></div>
+    <div class="section-label">Titulares del inmueble</div>
+    <div id="tit_wrap" class="repeater"></div>
+    <button class="add-btn" onclick="addTit()">+ Agregar titular</button>
+  </div>
+  <div id="blk_folio" class="hidden">
+    <div class="alert info">ℹ️ Sistema antiguo. Completá los datos tal como figuran en el título.</div>
+    <div class="form-grid cols-2" style="margin-bottom:12px">
+      <div class="field required"><label>Zona</label>
+        <select id="f_zona"><option value="">Seleccionar...</option><option>Norte</option><option>Sur</option><option>Primera Serie</option><option>Norte Horizontal</option><option>Sur Horizontal</option></select>
+      </div>
+      <div class="field"><label>Plano</label><input type="text" id="f_plano"></div>
+    </div>
+    <div class="form-grid cols-3" style="margin-bottom:12px">
+      <div class="field required"><label>Lote</label><input type="text" id="f_lote"></div>
+      <div class="field required"><label>Manzana</label><input type="text" id="f_manz"></div>
+      <div class="field required"><label>Tomo</label><input type="text" id="f_tomo"></div>
+    </div>
+    <div class="form-grid cols-2" style="margin-bottom:12px">
+      <div class="field required"><label>Folio</label><input type="text" id="f_folio"></div>
+      <div class="field required"><label>Año</label><input type="text" id="f_anio" placeholder="Ej: 1975"></div>
+    </div>
+    <div class="section-label">Nomenclatura Catastral</div>
+    <div class="nc-grid">
+      <div class="nc-field"><label>C</label><input type="text" id="fo_c"></div>
+      <div class="nc-field"><label>S</label><input type="text" id="fo_s"></div>
+      <div class="nc-field"><label>M</label><input type="text" id="fo_m"></div>
+      <div class="nc-field"><label>P</label><input type="text" id="fo_p"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-label">Titulares del inmueble</div>
+    <div id="tit_wrap" class="repeater"></div>
+    <button class="add-btn" onclick="addTit()">+ Agregar titular</button>
+  </div>
+  <div class="divider"></div>
+  <div class="field"><label>Observaciones</label><textarea id="f_obs" placeholder="Observaciones adicionales..."></textarea></div>`;
+}
+
+function toggleSistCABA(){
+  const v=gv('f_sist');
+  document.getElementById('blk_mat').classList.toggle('hidden',v!=='mat');
+  document.getElementById('blk_folio').classList.toggle('hidden',v!=='folio');
+  if(v&&document.getElementById('tit_wrap')&&!document.getElementById('tit_wrap').children.length)addTit();
+}
+
+function addTit(){
+  const i=ctr.tit++;
+  const w=document.getElementById('tit_wrap');if(!w)return;
+  const d=document.createElement('div');d.className='repeater-item';d.id='tit_'+i;
+  d.innerHTML=`<button class="remove-btn" onclick="document.getElementById('tit_${i}').remove()">×</button>
+  <div class="form-grid cols-2" style="margin-bottom:10px">
+    <div class="field"><label>Tipo</label>
+      <select id="tt_${i}" onchange="toggleTit(${i})"><option value="f">Persona Física</option><option value="j">Persona Jurídica</option></select>
+    </div>
+  </div>
+  <div id="tf_${i}"><div class="form-grid cols-2">
+    <div class="field required"><label>Apellidos</label><input type="text" id="tap_${i}"></div>
+    <div class="field required"><label>Nombres</label><input type="text" id="tnom_${i}"></div>
+  </div></div>
+  <div id="tj_${i}" class="hidden"><div class="field required"><label>Razón Social</label><input type="text" id="trs_${i}"></div></div>`;
+  w.appendChild(d);
+}
+function toggleTit(i){const v=gv('tt_'+i);document.getElementById('tf_'+i).classList.toggle('hidden',v!=='f');document.getElementById('tj_'+i).classList.toggle('hidden',v!=='j');}
+function getTits(){
+  const r=[];
+  document.querySelectorAll('[id^="tit_"][class="repeater-item"]').forEach(el=>{
+    const i=el.id.replace('tit_','');const v=gv('tt_'+i);
+    r.push(v==='f'?`${gv('tap_'+i)}, ${gv('tnom_'+i)}`:`${gv('trs_'+i)} (P.J.)`);
+  });return r;
+}
+
+// INHIBICION CABA — una sola persona, sin botón agregar
+function fInhCABA(c){
+  c.innerHTML=`
+  <div class="section-label">Datos de la persona</div>
+  <div class="alert info">ℹ️ Cada informe de inhibición corresponde a una sola persona. Para consultar otra persona, agregá un nuevo trámite.</div>
+  <div class="form-grid cols-2" style="margin-bottom:10px">
+    <div class="field"><label>Tipo</label>
+      <select id="itp" onchange="toggleInhCABA()"><option value="f">Persona Física</option><option value="j">Persona Jurídica</option></select>
+    </div>
+  </div>
+  <div id="inh_f">
+    <div class="form-grid cols-2" style="margin-bottom:10px">
+      <div class="field required"><label>Apellidos</label><input type="text" id="iap"></div>
+      <div class="field required"><label>Nombres</label><input type="text" id="inom"></div>
+    </div>
+    <div class="form-grid cols-2">
+      <div class="field required"><label>Tipo doc.</label><select id="itdoc"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option></select></div>
+      <div class="field required"><label>Número</label><input type="text" id="indoc"></div>
+    </div>
+  </div>
+  <div id="inh_j" class="hidden">
+    <div class="form-grid cols-2">
+      <div class="field required"><label>Razón Social</label><input type="text" id="irs"></div>
+      <div class="field required"><label>CUIT</label><input type="text" id="icut"></div>
+    </div>
+  </div>`;
+}
+function toggleInhCABA(){const v=gv('itp');document.getElementById('inh_f').classList.toggle('hidden',v!=='f');document.getElementById('inh_j').classList.toggle('hidden',v!=='j');}
+
+// FRECUENCIA CABA — con matrícula visual + finca/UF
+function fFrecCABA(c){
+  c.innerHTML=`
+  <div class="section-label">Matrícula del inmueble</div>
+  ${matVisual('fr')}`;
+}
+
+// INDICE TITULARIDAD CABA — una sola persona
+function fIdxCABA(c){
+  c.innerHTML=`
+  <div class="section-label">Datos de la persona</div>
+  <div class="alert info">ℹ️ Cada consulta de Índice de Titularidad corresponde a una sola persona. Para consultar otra, agregá un nuevo trámite.</div>
+  <div class="form-grid cols-2" style="margin-bottom:10px">
+    <div class="field"><label>Tipo</label>
+      <select id="itp" onchange="toggleInhCABA()"><option value="f">Persona Física</option><option value="j">Persona Jurídica</option></select>
+    </div>
+  </div>
+  <div id="inh_f">
+    <div class="form-grid cols-2" style="margin-bottom:10px">
+      <div class="field required"><label>Apellidos</label><input type="text" id="iap"></div>
+      <div class="field required"><label>Nombres</label><input type="text" id="inom"></div>
+    </div>
+    <div class="form-grid cols-2">
+      <div class="field required"><label>Tipo doc.</label><select id="itdoc"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option></select></div>
+      <div class="field required"><label>Número</label><input type="text" id="indoc"></div>
+    </div>
+  </div>
+  <div id="inh_j" class="hidden">
+    <div class="form-grid cols-2">
+      <div class="field required"><label>Razón Social</label><input type="text" id="irs"></div>
+      <div class="field required"><label>CUIT</label><input type="text" id="icut"></div>
+    </div>
+  </div>`;
+}
+
+// INFO 6 — solo dirección + UF opcional
+function fInfo6(c){
+  c.innerHTML=`
+  <div class="section-label">Datos del inmueble</div>
+  <div class="alert info">ℹ️ El Informe INFO 6 permite conocer la matrícula y datos registrales a partir de la dirección. Solo se necesita la dirección y, en caso de PH, la Unidad Funcional.</div>
+  <div class="field required" style="margin-bottom:14px"><label>Dirección del inmueble</label>
+    <input type="text" id="i6_dir" placeholder="Ej: Moreno 467 · Av. Corrientes 1234">
+    <div class="hint">Ingresá la dirección tal como figura en el título o en la documentación disponible.</div>
+  </div>
+  <div class="toggle-row" style="margin-bottom:10px">
+    <input type="checkbox" id="i6_ph" onchange="toggleInfo6PH()">
+    <label for="i6_ph">El inmueble está sometido a Propiedad Horizontal (tiene Unidad Funcional)</label>
+  </div>
+  <div id="i6_uf_blk" class="hidden" style="margin-top:10px">
+    <div class="field"><label>Unidad Funcional (UF)</label><input type="text" id="i6_uf" placeholder="Ej: 7"></div>
+  </div>`;
+}
+function toggleInfo6PH(){
+  document.getElementById('i6_uf_blk').classList.toggle('hidden',!gc('i6_ph'));
+}
+
+// ============================================================
+// PBA FORMS
+// ============================================================
+function fDomPBA(c){
+  c.innerHTML=`
+  <div class="alert warning">⚠️ <strong>Atención:</strong> Verificá que todos los datos coincidan exactamente con la escritura. Un dato incorrecto genera el rechazo y la pérdida del sellado.</div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Motivo de la solicitud</label>
+      <select id="pb_mot"><option value="">Seleccionar...</option><option value="503">503 — Boleto Compraventa Finca</option><option value="508">508 — Boleto Compraventa PH</option><option value="otro">Otro</option></select>
+    </div>
+    <div class="field"><label>Descripción del motivo</label><input type="text" id="pb_desc"></div>
+  </div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Partido</label>${pSel('pb_part')}</div>
+    <div class="field required"><label>Sistema registral</label>
+      <select id="pb_sist" onchange="toggleSistPBA()"><option value="">Seleccionar...</option><option value="mat">Matriculado (Folio Real)</option><option value="nomat">No Matriculado (Folio antiguo)</option></select>
+    </div>
+  </div>
+  <div id="pb_mat_blk" class="hidden">${matPBA('pbm')}</div>
+  <div id="pb_folio_blk" class="hidden">
+    <div class="form-grid cols-2" style="margin-bottom:12px">
+      <div class="field required"><label>Tipo inscripción</label><select id="pb_tinsc"><option>Protocolos</option><option>Legajo P.H.</option></select></div>
+      <div class="field required"><label>Folio — Año — Legajo — D.H.</label><input type="text" id="pb_fdat" placeholder="Ej: Folio 23 Año 1975 Legajo 4"></div>
+    </div>
+  </div>
+  ${ncBlock('pbn')}
+  <div class="form-grid cols-2" style="margin-bottom:12px;margin-top:12px">
+    <div class="field required"><label>Tipo Designación</label><select id="pb_tdes"><option value="titulo">Título</option><option value="plano">Plano</option></select></div>
+  </div>
+  <div class="field" style="margin-bottom:12px"><label>Designación</label>
+    <textarea id="pb_des" placeholder="Ej: Designado con el Lote 4 de la Manzana 6 a · Plano PH 117-56-77"></textarea>
+  </div>
+  <div class="toggle-row" style="margin-bottom:12px"><input type="checkbox" id="pb_ind"><label for="pb_ind">Parte Indivisa</label></div>
+  <div class="field" style="margin-bottom:12px"><label>Titulares y Observaciones</label>
+    <textarea id="pb_tit" placeholder="Apellido y Nombre de cada titular registral que figura en el título"></textarea>
+  </div>
+  <div class="field" style="margin-bottom:12px"><label>Continuación — Medidas y linderos</label>
+    <textarea id="pb_med" placeholder="Medidas y linderos, o superficie de UF"></textarea>
+  </div>
+  ${fileUpload('pb_pdf')}`;
+}
+function toggleSistPBA(){
+  const v=gv('pb_sist');
+  document.getElementById('pb_mat_blk').classList.toggle('hidden',v!=='mat');
+  document.getElementById('pb_folio_blk').classList.toggle('hidden',v!=='nomat');
+}
+
+// INHIBICION/CESION PBA — una sola persona
+function fInhPBA(c){
+  c.innerHTML=`
+  <div class="form-grid cols-2" style="margin-bottom:14px">
+    <div class="field required"><label>Motivo</label>
+      <select id="pi_mot"><option value="">Seleccionar...</option><option value="503">503 — Boleto Finca</option><option value="508">508 — Boleto PH</option><option>Otro</option></select>
+    </div>
+    <div class="field"><label>Descripción</label><input type="text" id="pi_desc"></div>
+  </div>
+  <div class="section-label">Datos de la persona</div>
+  <div class="alert info">ℹ️ Cada informe corresponde a una sola persona. Para consultar otra persona, agregá un nuevo trámite.</div>
+  <div class="form-grid cols-2" style="margin-bottom:10px">
+    <div class="field"><label>Tipo</label>
+      <select id="pi_tp" onchange="toggleInhPBA()"><option value="f">Persona Humana</option><option value="j">Persona Jurídica</option></select>
+    </div>
+  </div>
+  <div id="pi_f">
+    <div class="form-grid cols-2" style="margin-bottom:10px">
+      <div class="field required"><label>Apellido</label><input type="text" id="pi_ap"></div>
+      <div class="field required"><label>Nombres</label><input type="text" id="pi_nom"></div>
+    </div>
+    <div class="form-grid cols-2" style="margin-bottom:10px">
+      <div class="field required"><label>Tipo doc.</label><select id="pi_tdoc"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option></select></div>
+      <div class="field required"><label>Número</label><input type="text" id="pi_ndoc"></div>
+    </div>
+    <div class="form-grid cols-3">
+      <div class="field"><label>Fecha nacimiento <span style="font-weight:400">(opcional)</span></label><input type="text" id="pi_fnac" placeholder="DD/MM/AAAA"></div>
+      <div class="field"><label>Apellido materno <span style="font-weight:400">(si lo conoce)</span></label><input type="text" id="pi_apm"></div>
+      <div class="field"><label>Nombre materno <span style="font-weight:400">(si lo conoce)</span></label><input type="text" id="pi_nomm"></div>
+    </div>
+  </div>
+  <div id="pi_j" class="hidden">
+    <div class="form-grid cols-2" style="margin-bottom:10px">
+      <div class="field required"><label>Tipo societario</label><input type="text" id="pi_tsoc" placeholder="SA, SRL, SAS..."></div>
+      <div class="field required"><label>CUIT</label><input type="text" id="pi_cuit"></div>
+    </div>
+    <div class="field" style="margin-bottom:10px"><label>Nombre sociedad <span style="font-weight:400">(sin tipo societario)</span></label><input type="text" id="pi_noms"></div>
+    <div class="field required"><label>Denominación <span style="font-weight:400">(según estatuto)</span></label><input type="text" id="pi_den"></div>
+  </div>
+  <div class="field" style="margin-top:10px"><label>Observaciones</label><input type="text" id="pi_obs"></div>`;
+}
+function toggleInhPBA(){const v=gv('pi_tp');document.getElementById('pi_f').classList.toggle('hidden',v!=='f');document.getElementById('pi_j').classList.toggle('hidden',v!=='j');}
+
+function fFrecPBA(c){
+  c.innerHTML=`
+  <div class="section-label">Datos del inmueble</div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Partido</label>${pSel('pf_part')}</div>
+  </div>
+  ${matPBA('pfm')}`;
+}
+
+function fCopiaAsientoPBA(c){
+  c.innerHTML=`
+  <div class="alert warning">⚠️ <strong>Atención:</strong> Verificá que todos los datos coincidan exactamente con la escritura.</div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Motivo</label><select id="ca_mot"><option value="503">503 — Boleto Finca</option><option value="508">508 — Boleto PH</option><option>Otro</option></select></div>
+    <div class="field required"><label>Partido</label>${pSel('ca_part')}</div>
+  </div>
+  ${matPBA('cam')}
+  ${ncBlock('can')}
+  <div class="form-grid cols-2" style="margin-top:12px">
+    <div class="field"><label>Tipo Designación</label><select id="ca_tdes"><option>Título</option><option>Plano</option></select></div>
+    <div class="field"><label>Designación</label><input type="text" id="ca_des"></div>
+  </div>
+  ${fileUpload('ca_pdf')}`;
+}
+
+function fIdxPBA(c){
+  c.innerHTML=`
+  <div class="section-label">Datos de la persona</div>
+  <div class="alert info">ℹ️ La búsqueda se realiza a nivel general, sin distinción de partido.</div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Apellidos</label><input type="text" id="pi2_ap"></div>
+    <div class="field required"><label>Nombres</label><input type="text" id="pi2_nom"></div>
+  </div>
+  <div class="form-grid cols-2">
+    <div class="field required"><label>Tipo doc.</label><select id="pi2_tdoc"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option><option>CUIT</option></select></div>
+    <div class="field required"><label>Número</label><input type="text" id="pi2_ndoc"></div>
+  </div>`;
+}
+
+// CATASTRO GCBA
+function fPlanosGCBA(c){
+  c.innerHTML=`
+  <div class="section-label">Datos — Sistema TAD GCBA</div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Número de Plano</label><input type="text" id="gc_nro" placeholder="Ej: 456"></div>
+    <div class="field required"><label>Año del Plano</label><input type="text" id="gc_anio" placeholder="Ej: 2023"></div>
+  </div>
+  <div class="field" style="margin-bottom:12px"><label>Dirección (según título)</label><input type="text" id="gc_dir" placeholder="Ej: Moreno 467"></div>
+  <div class="form-grid cols-3" style="margin-bottom:12px">
+    <div class="field required"><label>Chapa municipal</label><input type="text" id="gc_chapa"></div>
+    <div class="field"><label>Unidad Funcional</label><input type="text" id="gc_uf" placeholder="Si es PH"></div>
+    <div class="field required"><label>Código Postal</label><input type="text" id="gc_cp" placeholder="Ej: C1068"></div>
+  </div>
+  <div class="alert info">ℹ️ Recordá adjuntar en <strong>un solo PDF</strong>: Título de propiedad (o Dominio de los últimos 90 días) + DNI del propietario.</div>
+  ${fileUpload('gc_pdf','Adjuntar PDF (Título/Dominio + DNI combinados)')}`;
+}
+
+// ARBA
+function fPlanosARBA(c){
+  c.innerHTML=`
+  <div class="form-grid cols-2" style="margin-bottom:14px">
+    <div class="field required"><label>Partido</label>${pSel('ar_part')}</div>
+    <div class="field required"><label>Partida</label><input type="text" id="ar_partida"></div>
+  </div>
+  ${ncBlock('arn')}
+  <div class="form-grid cols-2" style="margin-top:12px">
+    <div class="field required"><label>Número de Plano</label><input type="text" id="ar_nro"></div>
+    <div class="field required"><label>Año de Plano</label><input type="text" id="ar_anio"></div>
+  </div>`;
+}
+
+// ============================================================
+// COLLECT + AGREGAR TRAMITE
+// ============================================================
+function collectDatos(){
+  const o=S.org,t=S.tipo;
+  const [arancel,importe]=PRECIOS[o][t][S.caracter];
+  let d={organismo:o,tipo:t,caracter:S.caracter,arancel,importe};
+
+  if(o==='RPI-CABA'){
+    if(t==='Dominio'){
+      d.sist=gv('f_sist');
+      if(d.sist==='mat'){
+        d.dir=gv('f_dir');d.circ=gv('dm_c');d.mat=gv('dm_m');
+        d.esFinca=gc('dm_finca');d.uf=d.esFinca?'':gv('dm_uf');
+      }else{
+        d.zona=gv('f_zona');d.lote=gv('f_lote');d.manz=gv('f_manz');
+        d.plano=gv('f_plano');d.tomo=gv('f_tomo');d.folio=gv('f_folio');d.anio=gv('f_anio');
+        d.nc=`C:${gv('fo_c')} S:${gv('fo_s')} M:${gv('fo_m')} P:${gv('fo_p')}`;
+      }
+      d.titulares=getTits();d.obs=gv('f_obs');
+    }
+    else if(t==='Inhibición'||t==='Índice de Titularidad'){
+      const tp=gv('itp');
+      if(tp==='f') d.persona=`${gv('iap')}, ${gv('inom')} — ${gv('itdoc')} ${gv('indoc')}`;
+      else d.persona=`${gv('irs')} — CUIT: ${gv('icut')}`;
+    }
+    else if(t==='Frecuencia'){
+      d.circ=gv('fr_c');d.mat=gv('fr_m');d.esFinca=gc('fr_finca');d.uf=d.esFinca?'':gv('fr_uf');
+    }
+    else if(t==='INFO 6 / Mat. y Gravámenes'){
+      d.dir=gv('i6_dir');d.esPH=gc('i6_ph');d.uf=d.esPH?gv('i6_uf'):'';
+    }
+  }
+
+  if(o==='RPI-PBA'){
+    if(t==='Dominio'){
+      d.motivo=gv('pb_mot');d.descMot=gv('pb_desc');d.partido=gv('pb_part');
+      d.sist=gv('pb_sist');
+      if(d.sist==='mat'){d.mat=gv('pbm_m');d.esFinca=gc('pbm_finca');d.uf=d.esFinca?'':gv('pbm_uf');}
+      else{d.tipoInsc=gv('pb_tinsc');d.folioDat=gv('pb_fdat');}
+      d.nc=ncVal('pbn');d.tipDes=gv('pb_tdes');d.des=gv('pb_des');
+      d.indivisa=gc('pb_ind');d.titulares=gv('pb_tit');d.medidas=gv('pb_med');
+      if(S.archivos['pb_pdf'])d.archivo=S.archivos['pb_pdf'];
+    }
+    else if(t==='Inhibición'||t==='Cesión'){
+      d.motivo=gv('pi_mot');const tp=gv('pi_tp');
+      if(tp==='f'){
+        d.persona=`${gv('pi_ap')}, ${gv('pi_nom')} — ${gv('pi_tdoc')} ${gv('pi_ndoc')}`;
+        if(gv('pi_fnac'))d.fnac=gv('pi_fnac');
+        if(gv('pi_apm'))d.materno=`${gv('pi_apm')} ${gv('pi_nomm')}`;
+      }else d.persona=`${gv('pi_den')} (${gv('pi_tsoc')}) — CUIT: ${gv('pi_cuit')}`;
+    }
+    else if(t==='Frecuencia'){
+      d.partido=gv('pf_part');d.mat=gv('pfm_m');d.esFinca=gc('pfm_finca');d.uf=d.esFinca?'':gv('pfm_uf');
+    }
+    else if(t==='Copia Asiento Registral'){
+      d.motivo=gv('ca_mot');d.partido=gv('ca_part');
+      d.mat=gv('cam_m');d.esFinca=gc('cam_finca');d.uf=d.esFinca?'':gv('cam_uf');
+      d.nc=ncVal('can');d.tipDes=gv('ca_tdes');d.des=gv('ca_des');
+      if(S.archivos['ca_pdf'])d.archivo=S.archivos['ca_pdf'];
+    }
+    else if(t==='Índice de Titularidad'){
+      d.persona=`${gv('pi2_ap')}, ${gv('pi2_nom')} — ${gv('pi2_tdoc')} ${gv('pi2_ndoc')}`;
+    }
+  }
+
+  if(o==='Catastro GCBA'&&t==='Planos'){
+    d.nro=gv('gc_nro');d.anio=gv('gc_anio');d.dir=gv('gc_dir');
+    d.chapa=gv('gc_chapa');d.uf=gv('gc_uf');d.cp=gv('gc_cp');
+    if(S.archivos['gc_pdf'])d.archivo=S.archivos['gc_pdf'];
+  }
+  if(o==='ARBA'&&t==='Planos PH'){
+    d.partido=gv('ar_part');d.partida=gv('ar_partida');
+    d.nc=ncVal('arn');d.nro=gv('ar_nro');d.anio=gv('ar_anio');
+  }
+  return d;
+}
+
+function agregarTramite(){
+  const d=collectDatos();
+  S.tramites.push(d);
+  S.archivos={};
+  updateBar();
+  goStep(6);
+}
+
+function agregarOtro(){
+  S.tipo='';S.caracter='';
+  goStep(3); // org is fixed, go to tipo
+}
+
+function updateBar(){
+  const bar=document.getElementById('pedidoBar');
+  bar.classList.remove('hidden');
+  document.getElementById('barCliente').textContent=`${S.cliente.ap}, ${S.cliente.nom}${S.cliente.emp?' — '+S.cliente.emp:''}`;
+  document.getElementById('barOrg').textContent=S.org;
+  document.getElementById('barCount').textContent=`${S.tramites.length} trámite${S.tramites.length!==1?'s':''}`;
+}
+
+// ============================================================
+// STEP 6
+// ============================================================
+function buildStep6(){
+  const cl=S.cliente;
+  document.getElementById('sub6').textContent=`Cliente: ${cl.ap}, ${cl.nom}${cl.emp?' — '+cl.emp:''}  ·  Organismo: ${S.org}`;
+  const lista=document.getElementById('lista6');lista.innerHTML='';
+  let total=0;
+  S.tramites.forEach((tr,i)=>{
+    total+=tr.importe;
+    const d=document.createElement('div');d.className='tramite-card';
+    d.innerHTML=`<div class="tc-num">${i+1}</div>
+    <div class="tc-info"><div class="tc-title">${tr.organismo} — ${tr.tipo}</div><div class="tc-sub">${tr.caracter}</div></div>
+    <div class="tc-price">$${tr.importe.toLocaleString('es-AR')}</div>
+    <button onclick="eliminarTramite(${i})" style="background:none;border:none;color:var(--error);cursor:pointer;font-size:18px;padding:4px 8px">×</button>`;
+    lista.appendChild(d);
+  });
+  const tb=document.getElementById('totalBar');
+  tb.innerHTML=`<div><div class="total-label">Total del pedido</div><div style="font-size:12px;color:var(--silver);margin-top:2px">${S.tramites.length} trámite${S.tramites.length!==1?'s':''}</div></div><div class="total-amount">$${total.toLocaleString('es-AR')}</div>`;
+  document.getElementById('resConfirmado').classList.add('hidden');
+}
+
+function eliminarTramite(i){S.tramites.splice(i,1);updateBar();buildStep6();}
+
+function confirmarPedido(){
+  if(!S.tramites.length){alert('No hay trámites en el pedido.');return;}
+  generarResumen();
+  document.getElementById('resConfirmado').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('resConfirmado').scrollIntoView({behavior:'smooth'}),100);
+}
+
+function generarResumen(){
+  const cl=S.cliente;
+  let L=[];
+  L.push('ESTUDIO LAVALLE & ASOC. — PEDIDO DE TRÁMITES');
+  L.push('═'.repeat(52));
+  L.push(`CLIENTE  : ${cl.ap}, ${cl.nom}`);
+  if(cl.emp)L.push(`EMPRESA  : ${cl.emp}`);
+  if(cl.tel)L.push(`TEL/WA   : ${cl.tel}`);
+  if(cl.mail)L.push(`MAIL     : ${cl.mail}`);
+  L.push(`ORGANISMO: ${S.org}`);
+  L.push(`FECHA    : ${new Date().toLocaleString('es-AR')}`);
+  L.push('─'.repeat(52));
+
+  let total=0;
+  S.tramites.forEach((tr,i)=>{
+    total+=tr.importe;
+    L.push(`\nTRÁMITE ${i+1}: ${tr.tipo} — ${tr.caracter}`);
+    L.push(`  Importe : $${tr.importe.toLocaleString('es-AR')}`);
+    const o=tr.organismo,t=tr.tipo;
+    if(o==='RPI-CABA'){
+      if(t==='Dominio'){
+        L.push(`  Sistema : ${tr.sist==='mat'?'Matrícula (Folio Real)':'Tomo y Folio'}`);
+        if(tr.sist==='mat'){
+          L.push(`  Dirección: ${tr.dir}`);
+          L.push(`  FR      : ${tr.circ} - ${tr.mat}${!tr.esFinca&&tr.uf?' / '+tr.uf:''} ${tr.esFinca?'(Finca)':'(PH)'}`);
+        }else{
+          L.push(`  Zona: ${tr.zona} | Lote: ${tr.lote} | Manzana: ${tr.manz} | Plano: ${tr.plano}`);
+          L.push(`  Tomo: ${tr.tomo} | Folio: ${tr.folio} | Año: ${tr.anio}`);
+          L.push(`  NC  : ${tr.nc}`);
+        }
+        if(tr.titulares&&tr.titulares.length)L.push(`  Titulares: ${tr.titulares.join(' | ')}`);
+        if(tr.obs)L.push(`  Obs: ${tr.obs}`);
+      }
+      else if(t==='Inhibición'||t==='Índice de Titularidad'||t==='Frecuencia'){
+        if(tr.persona)L.push(`  Persona : ${tr.persona}`);
+        if(tr.mat)L.push(`  FR      : ${tr.circ?tr.circ+' - ':''}${tr.mat}${!tr.esFinca&&tr.uf?' / '+tr.uf:''} ${tr.esFinca?'(Finca)':'(PH)'}`);
+      }
+      else if(t==='INFO 6 / Mat. y Gravámenes'){
+        L.push(`  Dirección: ${tr.dir}`);
+        if(tr.esPH)L.push(`  UF      : ${tr.uf}`);
+      }
+    }
+    if(o==='RPI-PBA'){
+      if(t==='Dominio'){
+        L.push(`  Motivo  : ${tr.motivo}${tr.descMot?' — '+tr.descMot:''}`);
+        L.push(`  Partido : ${tr.partido}`);
+        if(tr.sist==='mat')L.push(`  Matrícula: ${tr.mat}${!tr.esFinca&&tr.uf?' / '+tr.uf:''} ${tr.esFinca?'(Finca)':'(PH/UC)'}`);
+        else L.push(`  Folio   : ${tr.tipoInsc} — ${tr.folioDat}`);
+        L.push(`  NC      : ${tr.nc}`);
+        L.push(`  Desig.  : ${tr.tipDes} — ${tr.des}`);
+        if(tr.indivisa)L.push(`  Parte Indivisa: Sí`);
+        if(tr.titulares)L.push(`  Titulares: ${tr.titulares}`);
+        if(tr.medidas)L.push(`  Medidas : ${tr.medidas}`);
+        if(tr.archivo)L.push(`  Archivo : ${tr.archivo}`);
+      }
+      else if(t==='Inhibición'||t==='Cesión'){
+        L.push(`  Motivo  : ${tr.motivo}`);
+        L.push(`  Persona : ${tr.persona}`);
+        if(tr.fnac)L.push(`  Nac.    : ${tr.fnac}`);
+        if(tr.materno)L.push(`  Materno : ${tr.materno}`);
+      }
+      else if(t==='Frecuencia'){
+        L.push(`  Partido : ${tr.partido}`);
+        L.push(`  Matrícula: ${tr.mat}${!tr.esFinca&&tr.uf?' / '+tr.uf:''} ${tr.esFinca?'(Finca)':'(PH/UC)'}`);
+      }
+      else if(t==='Copia Asiento Registral'){
+        L.push(`  Partido : ${tr.partido}`);
+        L.push(`  Matrícula: ${tr.mat}${!tr.esFinca&&tr.uf?' / '+tr.uf:''} ${tr.esFinca?'(Finca)':'(PH/UC)'}`);
+        L.push(`  NC      : ${tr.nc}`);
+        if(tr.archivo)L.push(`  Archivo : ${tr.archivo}`);
+      }
+      else if(t==='Índice de Titularidad'){
+        L.push(`  Persona : ${tr.persona}`);
+        L.push(`  Búsqueda: General (sin distinción de partido)`);
+      }
+    }
+    if(o==='Catastro GCBA'&&t==='Planos'){
+      L.push(`  Plano   : ${tr.nro}-${tr.anio}`);
+      L.push(`  Dirección: ${tr.dir} | Chapa: ${tr.chapa} | CP: ${tr.cp}`);
+      if(tr.uf)L.push(`  UF      : ${tr.uf}`);
+      if(tr.archivo)L.push(`  Archivo : ${tr.archivo}`);
+    }
+    if(o==='ARBA'&&t==='Planos PH'){
+      L.push(`  Partido : ${tr.partido} | Partida: ${tr.partida}`);
+      L.push(`  NC      : ${tr.nc}`);
+      L.push(`  Plano   : ${tr.nro}-${tr.anio}`);
+    }
+    L.push('  '+'·'.repeat(50));
+  });
+
+  L.push(`\n${'═'.repeat(52)}`);
+  L.push(`TOTAL: $${total.toLocaleString('es-AR')} (${S.tramites.length} trámite${S.tramites.length!==1?'s':''})`);
+  document.getElementById('copyArea').textContent=L.join('\n');
+  renderResBox(total);
+}
+
+function renderResBox(total){
+  const cl=S.cliente;
+  let h=`<div class="resumen-title">✅ Pedido confirmado — ${new Date().toLocaleDateString('es-AR')}</div>`;
+  h+=`<div class="resumen-section">Cliente</div>`;
+  h+=`<div class="resumen-row"><span class="resumen-key">Nombre</span><span class="resumen-val">${cl.ap}, ${cl.nom}</span></div>`;
+  if(cl.emp)h+=`<div class="resumen-row"><span class="resumen-key">Empresa</span><span class="resumen-val">${cl.emp}</span></div>`;
+  h+=`<div class="resumen-row"><span class="resumen-key">Organismo</span><span class="resumen-val">${S.org}</span></div>`;
+  h+=`<div class="resumen-section">Trámites</div>`;
+  S.tramites.forEach((tr,i)=>{
+    h+=`<div class="resumen-tramite-block">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:5px">Trámite ${i+1}</div>
+      <div class="resumen-row"><span class="resumen-key">Tipo</span><span class="resumen-val">${tr.tipo}</span></div>
+      <div class="resumen-row"><span class="resumen-key">Carácter</span><span class="resumen-val">${tr.caracter}</span></div>
+      <div class="resumen-row"><span class="resumen-key">Importe</span><span class="resumen-val">$${tr.importe.toLocaleString('es-AR')}</span></div>
+    </div>`;
+  });
+  h+=`<div class="resumen-section">Total</div>`;
+  h+=`<div class="resumen-row"><span class="resumen-key">Total a abonar</span><span class="resumen-val" style="color:var(--gold);font-size:20px">$${total.toLocaleString('es-AR')}</span></div>`;
+  document.getElementById('resBox').innerHTML=h;
+}
+
+function copiar(){
+  navigator.clipboard.writeText(document.getElementById('copyArea').textContent).then(()=>{
+    const b=event.currentTarget;b.textContent='✅ ¡Copiado!';
+    setTimeout(()=>b.textContent='📋 Copiar datos',2000);
+  });
+}
+
+function descargarCSV(){
+  try{
+    if(!S.tramites||!S.tramites.length){alert('No hay tramites para descargar.');return;}
+    const cl=S.cliente||{};
+    const ap=cl.ap||'Cliente';
+    const nom=cl.nom||'';
+    const emp=cl.emp||'';
+    const fecha=new Date().toLocaleDateString('es-AR');
+    const fechaArchivo=fecha.replace(/\//g,'-');
+    let csv='SEP=,\n';
+    csv+='ESTUDIO LAVALLE & ASOC. - REGISTRO DE TRAMITES\n';
+    csv+='"Cliente:","'+ap+(nom?' '+nom:'')+(emp?' - '+emp:'')+'"\n';
+    csv+='"Organismo:","'+(S.org||'')+'"\n';
+    csv+='"Fecha:","'+fecha+'"\n\n';
+    csv+='Nro,Organismo,Tipo,Caracter,Importe,Datos principales,Estado,Pago,Factura\n';
+    S.tramites.forEach((tr,i)=>{
+      try{
+        let datos='';
+        if(tr.mat) datos+='Mat: '+(tr.circ?tr.circ+'-':'')+tr.mat+((!tr.esFinca&&tr.uf)?'/'+tr.uf:'');
+        if(tr.persona) datos+=(datos?' | ':'')+tr.persona;
+        if(tr.dir) datos+=(datos?' | ':'')+tr.dir;
+        if(tr.nro) datos+=(datos?' | ':'')+'Plano '+tr.nro+(tr.anio?'-'+tr.anio:'');
+        if(tr.partido) datos+=(datos?' | ':'')+'Partido: '+tr.partido;
+        datos=datos.replace(/"/g,"'").replace(/[\n\r]/g,' ');
+        const org=(tr.organismo||'').replace(/"/g,"'");
+        const tipo=(tr.tipo||'').replace(/"/g,"'");
+        const car=(tr.caracter||'').replace(/"/g,"'");
+        const imp=tr.importe||0;
+        csv+=(i+1)+',"'+org+'","'+tipo+'","'+car+'",'+imp+',"'+datos+'",Pendiente,No,No\n';
+      }catch(e){csv+=(i+1)+',Error al procesar fila,,,,,,Pendiente,No,No\n';}
+    });
+    const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='Lavalle_'+ap+'_'+fechaArchivo+'.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},200);
+  }catch(err){
+    console.error('Error al descargar:',err);
+    alert('Hubo un error al generar el archivo. Por favor copia los datos manualmente.');
+  }
+}
+
+function descargarCSV_OLD(){} // replaced
+
+function enviarWhatsApp(){
+  try{
+    const cl=S.cliente||{};
+    const ap=cl.ap||'';
+    const nom=cl.nom||'';
+    const emp=cl.emp||'';
+
+    // Get the full text from copyArea
+    const texto=document.getElementById('copyArea').textContent||'';
+
+    // WhatsApp has a character limit on URLs — truncate if needed
+    const MAX=2000;
+    let msg=texto.length>MAX?texto.substring(0,MAX)+'...\n(ver resumen completo en el mail)':texto;
+
+    // WA Business number — 54 (Argentina) + numero sin 0 ni 15
+    const numero='5491156455934'; // 15-5645-5934 => 5491155455934
+    const waUrl='https://wa.me/'+numero+'?text='+encodeURIComponent(msg);
+
+    window.open(waUrl,'_blank');
+
+    // Feedback on button
+    setTimeout(()=>{
+      const btns=document.querySelectorAll('[onclick="enviarWhatsApp()"]');
+      btns.forEach(btn=>{
+        btn.textContent='✅ WhatsApp abierto';
+        setTimeout(()=>btn.textContent='📱 Enviar por WhatsApp',4000);
+      });
+    },800);
+  }catch(err){
+    console.error('Error WhatsApp:',err);
+    alert('No se pudo abrir WhatsApp. Por favor copia los datos y envialos manualmente.');
+  }
+}
+
+function enviarMail(){
+  try{
+    const cl=S.cliente||{};
+    const ap=cl.ap||'';
+    const nom=cl.nom||'';
+    const emp=cl.emp||'';
+    const fecha=new Date().toLocaleDateString('es-AR');
+    
+    // Build subject
+    const asunto=encodeURIComponent('Solicitud de tramites - '+ap+(nom?' '+nom:'')+(emp?' ('+emp+')':''));
+    
+    // Build body from copyArea text
+    const cuerpo=document.getElementById('copyArea').textContent||'';
+    
+    // mailto with encoded body
+    const mailBody=encodeURIComponent(cuerpo);
+    const mailto='mailto:lavalle.garone@gmail.com?subject='+asunto+'&body='+mailBody;
+    
+    // Open mail client
+    window.location.href=mailto;
+    
+    // Show confirmation message after a moment
+    setTimeout(()=>{
+      const btn=document.querySelector('[onclick="enviarMail()"]');
+      if(btn){
+        btn.textContent='✅ Mail abierto - recordá enviarlo';
+        btn.style.background='linear-gradient(135deg,#2d8a5e,#3aad77)';
+        setTimeout(()=>{
+          btn.textContent='✉️ Enviar pedido por mail al Estudio';
+          btn.style.background='';
+        },5000);
+      }
+    },1000);
+  }catch(err){
+    console.error('Error al abrir mail:',err);
+    alert('No se pudo abrir el cliente de correo. Por favor copia los datos y envialos manualmente a lavalle.garone@gmail.com');
+  }
+}
+
+function enviarAGoogleSheets(callback){
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+  
+  const payload = {
+    cliente: S.cliente,
+    org: S.org,
+    tramites: S.tramites
+  };
+
+  // Usar imagen/script tag para evitar restriccion CORS desde archivo local
+  const datos = encodeURIComponent(JSON.stringify(payload));
+  const url = SCRIPT_URL + '?datos=' + datos;
+  
+  const script = document.createElement('script');
+  script.src = url + '&callback=_gsCallback';
+  
+  window._gsCallback = function(resp){
+    document.body.removeChild(script);
+    delete window._gsCallback;
+    if(callback) callback(resp && resp.ok);
+  };
+  
+  // Timeout por si no responde
+  const timer = setTimeout(()=>{
+    // Mode no-cors como fallback — no podemos leer la respuesta
+    // pero el servidor igual recibe los datos
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    }).catch(()=>{});
+    if(callback) callback(true); // Asumimos ok
+  }, 4000);
+  
+  script.onerror = ()=>{
+    clearTimeout(timer);
+    // Fallback con fetch no-cors
+    fetch(SCRIPT_URL, {
+      method: 'POST', 
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    }).catch(()=>{});
+    if(callback) callback(true);
+  };
+  
+  document.body.appendChild(script);
+}
+
+function nuevoPedido(){
+  S={cliente:{tipo:'',ap:'',nom:'',emp:'',tel:'',mail:''},org:'',tipo:'',caracter:'',tramites:[],archivos:{}};
+  ctr={tit:0,inh:0,pInh:0};
+  document.querySelectorAll('.option-card,.pill,.char-card').forEach(x=>x.classList.remove('selected'));
+  document.getElementById('pedidoBar').classList.add('hidden');
+  document.getElementById('resConfirmado').classList.add('hidden');
+  ['c_ap','c_nom','c_tel','c_mail'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const ce=document.getElementById('c_emp');if(ce)ce.value='';
+  goStep(1);
+}
+</script>
+</body>
+</html>
