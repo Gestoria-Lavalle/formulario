@@ -176,7 +176,7 @@ main{width:100%;max-width:820px;padding:22px 20px 80px}
     <div class="section-label">Datos personales</div>
     <div class="form-grid cols-2" style="margin-bottom:12px">
       <div class="field required"><label>Apellido</label>
-        <input type="text" id="c_ap" list="dl_ap" placeholder="Ej: González" oninput="autocomplete()">
+        <input type="text" id="c_ap" list="dl_ap" placeholder="Ej: González" oninput="autocompletarDatos()">
         <datalist id="dl_ap"></datalist>
       </div>
       <div class="field required"><label>Nombre/s</label><input type="text" id="c_nom" placeholder="Ej: Claudio Martín"></div>
@@ -325,7 +325,7 @@ function buildDatalist(){
   const emps=[...new Set(list.filter(c=>c.emp).map(c=>c.emp))];
   document.getElementById('dl_emp').innerHTML=emps.map(e=>`<option value="${e}">`).join('');
 }
-function autocomplete(){
+function autocompletarDatos(){
   const ap=document.getElementById('c_ap').value.trim();
   if(!ap)return;
   const list=JSON.parse(localStorage.getItem('lv_cl')||'[]');
@@ -1292,51 +1292,34 @@ function enviarMail(){
 }
 
 function enviarAGoogleSheets(callback){
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
   
-  const payload = {
+  var payload = {
     cliente: S.cliente,
     org: S.org,
     tramites: S.tramites
   };
 
-  // Usar imagen/script tag para evitar restriccion CORS desde archivo local
-  const datos = encodeURIComponent(JSON.stringify(payload));
-  const url = SCRIPT_URL + '?datos=' + datos;
-  
-  const script = document.createElement('script');
-  script.src = url + '&callback=_gsCallback';
-  
-  window._gsCallback = function(resp){
-    document.body.removeChild(script);
-    delete window._gsCallback;
-    if(callback) callback(resp && resp.ok);
-  };
-  
-  // Timeout por si no responde
-  const timer = setTimeout(()=>{
-    // Mode no-cors como fallback — no podemos leer la respuesta
-    // pero el servidor igual recibe los datos
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(payload)
-    }).catch(()=>{});
-    if(callback) callback(true); // Asumimos ok
-  }, 4000);
-  
-  script.onerror = ()=>{
-    clearTimeout(timer);
-    // Fallback con fetch no-cors
-    fetch(SCRIPT_URL, {
-      method: 'POST', 
-      mode: 'no-cors',
-      body: JSON.stringify(payload)
-    }).catch(()=>{});
+  // Use fetch with no-cors (GitHub Pages can do this unlike local files)
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(){
+    // no-cors means we cant read response, but request was sent
     if(callback) callback(true);
-  };
-  
-  document.body.appendChild(script);
+  })
+  .catch(function(err){
+    console.error('Error enviando a Sheets:', err);
+    // Try GET as fallback
+    var datos = encodeURIComponent(JSON.stringify(payload));
+    var img = new Image();
+    img.src = SCRIPT_URL + '?datos=' + datos;
+    img.onload = function(){ if(callback) callback(true); };
+    img.onerror = function(){ if(callback) callback(true); }; // assume sent
+  });
 }
 
 function nuevoPedido(){
