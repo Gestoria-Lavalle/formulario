@@ -1041,10 +1041,31 @@ function buildStep6(){
 function eliminarTramite(i){S.tramites.splice(i,1);updateBar();buildStep6();}
 
 function confirmarPedido(){
-  if(!S.tramites.length){alert('No hay trámites en el pedido.');return;}
+  if(!S.tramites.length){alert('No hay tramites en el pedido.');return;}
+  
+  // Mostrar resumen
   generarResumen();
   document.getElementById('resConfirmado').classList.remove('hidden');
   setTimeout(()=>document.getElementById('resConfirmado').scrollIntoView({behavior:'smooth'}),100);
+  
+  // Cambiar boton mientras envia
+  var btn = document.querySelector('[onclick="confirmarPedido()"]');
+  if(btn){ btn.textContent='Registrando...'; btn.disabled=true; }
+  
+  // Enviar a Google Sheets
+  enviarAGoogleSheets(function(ok){
+    if(btn){
+      btn.textContent = ok ? 'Pedido registrado' : 'Confirmar pedido';
+      btn.disabled = false;
+    }
+    if(ok){
+      var nota = document.createElement('div');
+      nota.style.cssText = 'background:#d4edda;border:1px solid #28a745;border-radius:10px;padding:12px 16px;font-size:13px;color:#155724;margin-bottom:12px;font-weight:600';
+      nota.innerHTML = 'Pedido registrado en la planilla del Estudio.';
+      var resConf = document.getElementById('resConfirmado');
+      resConf.insertBefore(nota, resConf.firstChild);
+    }
+  });
 }
 
 function generarResumen(){
