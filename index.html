@@ -576,7 +576,18 @@ function fileUpload(id,label='Adjuntar escritura / título (PDF)'){
 
 function showFile(id){
   const f=document.getElementById(id).files[0];
-  if(f){document.getElementById(id+'_name').textContent='✅ '+f.name;S.archivos[id]=f.name;}
+  if(!f)return;
+  document.getElementById(id+'_name').textContent='✅ '+f.name;
+  S.archivos[id]=f.name;
+  // Leer el archivo como base64 para enviarlo a Drive
+  const reader=new FileReader();
+  reader.onload=function(e){
+    // Guardar base64 sin el prefijo "data:application/pdf;base64,"
+    const base64=e.target.result.split(',')[1];
+    S.archivosBase64=S.archivosBase64||{};
+    S.archivosBase64[id]={base64:base64,nombre:f.name};
+  };
+  reader.readAsDataURL(f);
 }
 
 // ============================================================
@@ -959,7 +970,10 @@ function collectDatos(){
       else{d.tipoInsc=gv('pb_tinsc');d.folioDat=gv('pb_fdat');}
       d.nc=ncVal('pbn');d.tipDes=gv('pb_tdes');d.des=gv('pb_des');
       d.indivisa=gc('pb_ind');d.titulares=gv('pb_tit');d.medidas=gv('pb_med');
-      if(S.archivos['pb_pdf'])d.archivo=S.archivos['pb_pdf'];
+      if(S.archivos['pb_pdf']){
+      d.archivoNombre=S.archivos['pb_pdf'];
+      if(S.archivosBase64&&S.archivosBase64['pb_pdf']) d.archivoBase64=S.archivosBase64['pb_pdf'].base64;
+    }
     }
     else if(t==='Inhibición'||t==='Cesión'){
       d.motivo=gv('pi_mot');const tp=gv('pi_tp');
@@ -976,7 +990,10 @@ function collectDatos(){
       d.motivo=gv('ca_mot');d.partido=gv('ca_part');
       d.mat=gv('cam_m');d.esFinca=gc('cam_finca');d.uf=d.esFinca?'':gv('cam_uf');
       d.nc=ncVal('can');d.tipDes=gv('ca_tdes');d.des=gv('ca_des');
-      if(S.archivos['ca_pdf'])d.archivo=S.archivos['ca_pdf'];
+      if(S.archivos['ca_pdf']){
+      d.archivoNombre=S.archivos['ca_pdf'];
+      if(S.archivosBase64&&S.archivosBase64['ca_pdf']) d.archivoBase64=S.archivosBase64['ca_pdf'].base64;
+    }
     }
     else if(t==='Índice de Titularidad'){
       d.persona=`${gv('pi2_ap')}, ${gv('pi2_nom')} — ${gv('pi2_tdoc')} ${gv('pi2_ndoc')}`;
@@ -986,7 +1003,10 @@ function collectDatos(){
   if(o==='Catastro GCBA'&&t==='Planos'){
     d.nro=gv('gc_nro');d.anio=gv('gc_anio');d.dir=gv('gc_dir');
     d.chapa=gv('gc_chapa');d.uf=gv('gc_uf');d.cp=gv('gc_cp');
-    if(S.archivos['gc_pdf'])d.archivo=S.archivos['gc_pdf'];
+    if(S.archivos['gc_pdf']){
+      d.archivoNombre=S.archivos['gc_pdf'];
+      if(S.archivosBase64&&S.archivosBase64['gc_pdf']) d.archivoBase64=S.archivosBase64['gc_pdf'].base64;
+    }
   }
   if(o==='ARBA'&&t==='Planos PH'){
     d.partido=gv('ar_part');d.partida=gv('ar_partida');
@@ -999,6 +1019,7 @@ function agregarTramite(){
   const d=collectDatos();
   S.tramites.push(d);
   S.archivos={};
+  S.archivosBase64={};
   updateBar();
   goStep(6);
 }
