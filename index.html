@@ -1073,20 +1073,70 @@ function confirmarPedido(){
   var btn = document.querySelector('[onclick="confirmarPedido()"]');
   if(btn){ btn.textContent='Registrando...'; btn.disabled=true; }
   
-  // Enviar a Google Sheets
-  enviarAGoogleSheets(function(ok){
-    if(btn){
-      btn.textContent = ok ? 'Pedido registrado' : 'Confirmar pedido';
-      btn.disabled = false;
+  // Paso 1: Enviar datos del pedido
+  enviarAGoogleSheets(function(ok, nroPedido){
+    if(!ok){
+      if(btn){ btn.textContent='Confirmar pedido'; btn.disabled=false; }
+      return;
     }
-    if(ok){
-      var nota = document.createElement('div');
-      nota.style.cssText = 'background:#d4edda;border:1px solid #28a745;border-radius:10px;padding:12px 16px;font-size:13px;color:#155724;margin-bottom:12px;font-weight:600';
-      nota.innerHTML = 'Pedido registrado en la planilla del Estudio.';
-      var resConf = document.getElementById('resConfirmado');
-      resConf.insertBefore(nota, resConf.firstChild);
+    
+    // Paso 2: Subir archivos PDF si los hay
+    var archivosParaSubir = [];
+    S.tramites.forEach(function(tr){
+      if(tr.archivoBase64 && tr.archivoNombre){
+        archivosParaSubir.push({
+          base64: tr.archivoBase64,
+          nombre: tr.archivoNombre,
+          nroPedido: nroPedido || 0,
+          cliente: (S.cliente.ap||'') + (S.cliente.nom?', '+S.cliente.nom:''),
+          tipo: 'archivo'
+        });
+      }
+    });
+    
+    if(archivosParaSubir.length === 0){
+      // Sin archivos — mostrar confirmacion
+      mostrarConfirmacion(btn);
+      return;
     }
+    
+    // Subir archivos uno por uno
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+    var subidos = 0;
+    
+    if(btn) btn.textContent = 'Subiendo archivos (0/' + archivosParaSubir.length + ')...';
+    
+    archivosParaSubir.forEach(function(archivo, idx){
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'text/plain'},
+        body: JSON.stringify(archivo)
+      })
+      .then(function(){
+        subidos++;
+        if(btn) btn.textContent = 'Subiendo archivos (' + subidos + '/' + archivosParaSubir.length + ')...';
+        if(subidos === archivosParaSubir.length){
+          mostrarConfirmacion(btn);
+        }
+      })
+      .catch(function(){
+        subidos++;
+        if(subidos === archivosParaSubir.length){
+          mostrarConfirmacion(btn);
+        }
+      });
+    });
   });
+}
+
+function mostrarConfirmacion(btn){
+  if(btn){ btn.textContent='Pedido registrado'; btn.disabled=false; }
+  var nota = document.createElement('div');
+  nota.style.cssText = 'background:#d4edda;border:1px solid #28a745;border-radius:10px;padding:12px 16px;font-size:13px;color:#155724;margin-bottom:12px;font-weight:600';
+  nota.innerHTML = 'Pedido registrado en la planilla del Estudio.';
+  var resConf = document.getElementById('resConfirmado');
+  if(resConf) resConf.insertBefore(nota, resConf.firstChild);
 }
 
 function generarResumen(){
@@ -1336,31 +1386,38 @@ function enviarMail(){
 function enviarAGoogleSheets(callback){
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
   
+  // Enviar sin archivos base64 (se suben por separado)
+  var tramitesSinArchivos = S.tramites.map(function(tr){
+    var t = Object.assign({}, tr);
+    delete t.archivoBase64;
+    return t;
+  });
+  
   var payload = {
     cliente: S.cliente,
     org: S.org,
-    tramites: S.tramites
+    tramites: tramitesSinArchivos
   };
 
-  // Use fetch with no-cors (GitHub Pages can do this unlike local files)
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify(payload)
-  })
-  .then(function(){
-    // no-cors means we cant read response, but request was sent
-    if(callback) callback(true);
+  // Usar GET con datos para evitar CORS
+  var datosStr = encodeURIComponent(JSON.stringify(payload));
+  var url = SCRIPT_URL + '?datos=' + datosStr;
+  
+  fetch(url, { method: 'GET' })
+  .then(function(resp){ return resp.json(); })
+  .then(function(data){
+    if(callback) callback(data.ok, data.nroPedido);
   })
   .catch(function(err){
     console.error('Error enviando a Sheets:', err);
-    // Try GET as fallback
-    var datos = encodeURIComponent(JSON.stringify(payload));
-    var img = new Image();
-    img.src = SCRIPT_URL + '?datos=' + datos;
-    img.onload = function(){ if(callback) callback(true); };
-    img.onerror = function(){ if(callback) callback(true); }; // assume sent
+    // Fallback no-cors
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+    if(callback) callback(true, null);
   });
 }
 
