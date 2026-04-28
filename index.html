@@ -1149,10 +1149,14 @@ function mostrarConfirmacion(btn, nroPedido, tieneArchivos){
     wa.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:14px 18px;font-size:13px;color:#856404;margin-bottom:10px;line-height:1.6';
     var nroWA = nroPedido ? ' del Pedido #' + nroPedido : '';
     var waMsg = encodeURIComponent('Hola, le envio la documentacion' + nroWA + ' adjunta.');
-    wa.innerHTML = '📎 <strong>Tenés documentación para adjuntar.</strong><br>Por favor enviá el PDF por WhatsApp al Estudio haciendo clic en el botón de abajo e indicando el número de pedido.<br><br>'
-      + '<button onclick="window.open('https://wa.me/5491156455934?text=' + waMsg + '','_blank')" '
-      + 'style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;width:100%">'
+    var waUrl = 'https://wa.me/5491156455934?text=' + waMsg;
+    wa.innerHTML = '<strong>📎 Tenés documentación para adjuntar.</strong><br>Por favor enviá el PDF por WhatsApp al Estudio indicando el número de pedido.<br><br>'
+      + '<button id="btnWA" style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;width:100%">'
       + '📱 Enviar documentación por WhatsApp</button>';
+    setTimeout(function(){
+      var bwa = document.getElementById('btnWA');
+      if(bwa) bwa.onclick = function(){ window.open(waUrl,'_blank'); };
+    }, 100);
     resConf.insertBefore(wa, resConf.children[1]);
   }
 }
