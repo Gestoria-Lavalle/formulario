@@ -1096,7 +1096,7 @@ function confirmarPedido(){
     
     if(archivosParaSubir.length === 0){
       // Sin archivos — mostrar confirmacion
-      mostrarConfirmacion(btn);
+      mostrarConfirmacion(btn, nroPedido, false);
       return;
     }
     
@@ -1117,26 +1117,44 @@ function confirmarPedido(){
         subidos++;
         if(btn) btn.textContent = 'Subiendo archivos (' + subidos + '/' + archivosParaSubir.length + ')...';
         if(subidos === archivosParaSubir.length){
-          mostrarConfirmacion(btn);
+          mostrarConfirmacion(btn, nroPedido, true);
         }
       })
       .catch(function(){
         subidos++;
         if(subidos === archivosParaSubir.length){
-          mostrarConfirmacion(btn);
+          mostrarConfirmacion(btn, nroPedido, true);
         }
       });
     });
   });
 }
 
-function mostrarConfirmacion(btn){
-  if(btn){ btn.textContent='Pedido registrado'; btn.disabled=false; }
-  var nota = document.createElement('div');
-  nota.style.cssText = 'background:#d4edda;border:1px solid #28a745;border-radius:10px;padding:12px 16px;font-size:13px;color:#155724;margin-bottom:12px;font-weight:600';
-  nota.innerHTML = 'Pedido registrado en la planilla del Estudio.';
+function mostrarConfirmacion(btn, nroPedido, tieneArchivos){
+  if(btn){ btn.textContent='✅ Pedido confirmado'; btn.disabled=false; }
+  
   var resConf = document.getElementById('resConfirmado');
-  if(resConf) resConf.insertBefore(nota, resConf.firstChild);
+  if(!resConf) return;
+  
+  // Nota de confirmacion
+  var nota = document.createElement('div');
+  nota.style.cssText = 'background:#d4edda;border:1px solid #28a745;border-radius:10px;padding:14px 18px;font-size:13px;color:#155724;margin-bottom:10px;font-weight:600';
+  var nroTexto = nroPedido ? ' (Pedido #' + nroPedido + ')' : '';
+  nota.innerHTML = '✅ <strong>Pedido registrado en la planilla del Estudio</strong>' + nroTexto + '. Natalia ya puede verlo.';
+  resConf.insertBefore(nota, resConf.firstChild);
+  
+  // Si tiene archivos, mostrar aviso de WhatsApp
+  if(tieneArchivos){
+    var wa = document.createElement('div');
+    wa.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:14px 18px;font-size:13px;color:#856404;margin-bottom:10px;line-height:1.6';
+    var nroWA = nroPedido ? ' del Pedido #' + nroPedido : '';
+    var waMsg = encodeURIComponent('Hola, le envio la documentacion' + nroWA + ' adjunta.');
+    wa.innerHTML = '📎 <strong>Tenés documentación para adjuntar.</strong><br>Por favor enviá el PDF por WhatsApp al Estudio haciendo clic en el botón de abajo e indicando el número de pedido.<br><br>'
+      + '<button onclick="window.open('https://wa.me/5491156455934?text=' + waMsg + '','_blank')" '
+      + 'style="background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;width:100%">'
+      + '📱 Enviar documentación por WhatsApp</button>';
+    resConf.insertBefore(wa, resConf.children[1]);
+  }
 }
 
 function generarResumen(){
