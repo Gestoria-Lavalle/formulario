@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Gestión — Estudio Lavalle</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f1c35;
+  --navy-mid: #1a2d4f;
+  --navy-light: #243d6b;
+  --gold: #c9a84c;
+  --gold-light: #e8c46a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --white: #f8f9fc;
+  --text: #e2e8f4;
+  --text-dim: #8a9bb8;
+  --success: #2ecc71;
+  --warning: #f39c12;
+  --error: #e74c3c;
+  --info: #3498db;
+  --border: rgba(201,168,76,0.2);
+  --card: rgba(26,45,79,0.6);
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* LOGIN */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px;
+  width: 360px;
+  backdrop-filter: blur(20px);
+  text-align: center;
+}
+
+.login-logo {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 24px;
+}
+
+.login-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--white);
+}
+
+.login-card p {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--white);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+  letter-spacing: 4px;
+  font-size: 20px;
+}
+
+.login-input:focus { outline: none; border-color: var(--gold); }
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  border-radius: 10px;
+  color: var(--navy);
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.login-btn:hover { opacity: 0.9; }
+.login-error { color: var(--error); font-size: 13px; margin-top: 12px; }
+
+/* MAIN PANEL */
+#main-panel { display: none; }
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.header-title { font-size: 16px; font-weight: 600; color: var(--white); }
+.header-sub { font-size: 11px; color: var(--text-dim); }
+
+.header-actions { display: flex; align-items: center; gap: 12px; }
+
+.btn-refresh {
+  padding: 8px 16px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--gold);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover { background: rgba(201,168,76,0.25); }
+
+.btn-logout {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 8px;
+  color: var(--error);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* CONTENT */
+.content { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); }
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--white);
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.stat-card.gold .stat-value { color: var(--gold); }
+.stat-card.green .stat-value { color: var(--success); }
+.stat-card.red .stat-value { color: var(--error); }
+.stat-card.blue .stat-value { color: var(--info); }
+
+/* FILTERS */
+.filters-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.filter-select, .filter-input {
+  padding: 7px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--white);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.filter-select:focus, .filter-input:focus { outline: none; border-color: var(--gold); }
+
+.filter-select option { background: var(--navy-mid); }
+
+.btn-clear {
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.btn-clear:hover { color: var(--white); border-color: var(--white); }
+
+/* TABLE */
+.table-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.table-count {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  padding: 12px 14px;
+  background: rgba(15,28,53,0.8);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr {
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+  transition: background 0.15s;
+}
+
+tbody tr:hover { background: rgba(201,168,76,0.05); }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+  padding: 12px 14px;
+  color: var(--text);
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-pendiente { background: rgba(243,156,18,0.15); color: #f39c12; border: 1px solid rgba(243,156,18,0.3); }
+.badge-proceso { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
+.badge-listo { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+.badge-entregado { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid var(--border); }
+.badge-si { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+.badge-no { background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+
+/* ACTION BUTTONS */
+.btn-action {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: 'Sora', sans-serif;
+  transition: opacity 0.2s;
+  margin-right: 4px;
+}
+
+.btn-action:hover { opacity: 0.8; }
+.btn-edit { background: rgba(52,152,219,0.2); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
+.btn-pay { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 480px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.modal-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--white);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+}
+
+.form-control:focus { outline: none; border-color: var(--gold); }
+.form-control option { background: var(--navy-mid); }
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  border-radius: 8px;
+  color: var(--navy);
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: #1a4a2e; border: 1px solid #2ecc71; color: #2ecc71; }
+.toast.error { background: #4a1a1a; border: 1px solid #e74c3c; color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">⚖️</div>
+    <h2>Estudio Lavalle & Asoc.</h2>
+    <p>Panel de Gestión — Acceso restringido</p>
+    <input type="password" class="login-input" id="pin-input" placeholder="••••" maxlength="4" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div id="main-panel">
+  <header>
+    <div class="header-brand">
+      <div class="header-logo">⚖️</div>
+      <div>
+        <div class="header-title">Panel de Gestión</div>
+        <div class="header-sub">Estudio Lavalle & Asoc.</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span id="last-update" style="font-size:12px;color:var(--text-dim)"></span>
+      <button class="btn-refresh" onclick="loadData()">↻ Actualizar</button>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Trámites</div><div class="stat-value" id="stat-total">—</div></div>
+      <div class="stat-card gold"><div class="stat-label">Pendientes</div><div class="stat-value" id="stat-pendiente">—</div></div>
+      <div class="stat-card blue"><div class="stat-label">En Proceso</div><div class="stat-value" id="stat-proceso">—</div></div>
+      <div class="stat-card green"><div class="stat-label">Listos</div><div class="stat-value" id="stat-listo">—</div></div>
+      <div class="stat-card green"><div class="stat-label">Cobrado</div><div class="stat-value" id="stat-cobrado">—</div><div class="stat-sub">honorarios</div></div>
+      <div class="stat-card red"><div class="stat-label">A Cobrar</div><div class="stat-value" id="stat-acobrar">—</div><div class="stat-sub">honorarios</div></div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <span class="filter-label">Cliente</span>
+        <select class="filter-select" id="f-cliente" onchange="applyFilters()">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Organismo</span>
+        <select class="filter-select" id="f-org" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option>RPI-CABA</option>
+          <option>RPI-PBA</option>
+          <option>Catastro GCBA</option>
+          <option>ARBA</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Estado</span>
+        <select class="filter-select" id="f-estado" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option>Pendiente</option>
+          <option>En proceso</option>
+          <option>Listo</option>
+          <option>Entregado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Pago</span>
+        <select class="filter-select" id="f-pago" onchange="applyFilters()">
+          <option value="">Todos</option>
+          <option value="No">No pagado</option>
+          <option value="Si">Pagado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Buscar</span>
+        <input type="text" class="filter-input" id="f-buscar" placeholder="Nombre, tipo..." oninput="applyFilters()" style="width:160px">
+      </div>
+      <button class="btn-clear" onclick="clearFilters()">✕ Limpiar</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">Trámites</span>
+        <span class="table-count" id="table-count"></span>
+      </div>
+      <div class="table-wrap">
+        <div id="table-content" class="loading">
+          <div class="spinner"></div>
+          Cargando datos...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal">
+    <h3>✏️ Editar Trámite</h3>
+    <div class="modal-sub" id="modal-info"></div>
+    <div class="form-group">
+      <label class="form-label">Estado</label>
+      <select class="form-control" id="edit-estado">
+        <option>Pendiente</option>
+        <option>En proceso</option>
+        <option>Listo</option>
+        <option>Entregado</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nro de Entrada</label>
+      <input type="text" class="form-control" id="edit-entrada" placeholder="Ej: 2024-12345">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Pago</label>
+      <select class="form-control" id="edit-pago">
+        <option value="No">No pagado</option>
+        <option value="Si">Pagado</option>
+      </select>
+    </div>
+    <div class="form-group" id="grupo-forma-pago">
+      <label class="form-label">Forma de Pago</label>
+      <select class="form-control" id="edit-forma-pago">
+        <option value="">— Seleccionar —</option>
+        <option>Efectivo</option>
+        <option>Transferencia</option>
+        <option>Mercado Pago</option>
+        <option>Cheque</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observaciones</label>
+      <input type="text" class="form-control" id="edit-obs" placeholder="Notas adicionales...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarCambios()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const PIN = '1234'; // Cambiar por la clave deseada
+const SHEET_ID = '1NgHGxB50WVhWIbSMMV40Oh6mnWOy7Ygoymqn9QIrSyE';
+const API_KEY = 'AIzaSyCDVQUVUQddrgLmjVsda5IOS35etGcKfLU';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+
+let allData = [];
+let filteredData = [];
+let editingRow = null;
+
+// LOGIN
+function doLogin(){
+  const pin = document.getElementById('pin-input').value;
+  if(pin === PIN){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-panel').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('login-error').textContent = 'PIN incorrecto';
+    document.getElementById('pin-input').value = '';
+  }
+}
+
+function logout(){
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-panel').style.display = 'none';
+  document.getElementById('pin-input').value = '';
+}
+
+// LOAD DATA
+async function loadData(){
+  document.getElementById('table-content').innerHTML = '<div class="loading"><div class="spinner"></div>Cargando datos...</div>';
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/TRAMITES!A2:Q500?key=${API_KEY}`;
+    const r = await fetch(url);
+    const data = await r.json();
+    const rows = data.values || [];
+    
+    allData = rows.map((row, i) => ({
+      rowIndex: i + 2, // row in sheet (1-indexed, +1 for header)
+      nroPedido: row[0] || '',
+      nroTramite: row[1] || '',
+      fecha: row[2] || '',
+      cliente: row[3] || '',
+      organismo: row[4] || '',
+      tipo: row[5] || '',
+      caracter: row[6] || '',
+      importe: row[7] || '',
+      arancel: row[8] || '',
+      honorario: row[9] || '',
+      datos: row[10] || '',
+      archivo: row[11] || '',
+      entrada: row[12] || '',
+      estado: row[13] || 'Pendiente',
+      pago: row[14] || 'No',
+      formaPago: row[15] || '',
+      factura: row[16] || 'No',
+    }));
+
+    updateStats();
+    updateClientFilter();
+    applyFilters();
+    document.getElementById('last-update').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-AR');
+  } catch(err) {
+    document.getElementById('table-content').innerHTML = '<div class="empty">Error al cargar datos. Verificá la conexión.</div>';
+    console.error(err);
+  }
+}
+
+function updateStats(){
+  const total = allData.length;
+  const pendiente = allData.filter(r => r.estado === 'Pendiente').length;
+  const proceso = allData.filter(r => r.estado === 'En proceso').length;
+  const listo = allData.filter(r => r.estado === 'Listo' || r.estado === 'Entregado').length;
+  
+  let cobrado = 0, aCobrar = 0;
+  allData.forEach(r => {
+    const hon = parseFloat((r.honorario||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+    if(r.pago === 'Si') cobrado += hon;
+    else aCobrar += hon;
+  });
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-pendiente').textContent = pendiente;
+  document.getElementById('stat-proceso').textContent = proceso;
+  document.getElementById('stat-listo').textContent = listo;
+  document.getElementById('stat-cobrado').textContent = '$' + cobrado.toLocaleString('es-AR');
+  document.getElementById('stat-acobrar').textContent = '$' + aCobrar.toLocaleString('es-AR');
+}
+
+function updateClientFilter(){
+  const sel = document.getElementById('f-cliente');
+  const current = sel.value;
+  const clientes = [...new Set(allData.map(r => r.cliente))].filter(Boolean).sort();
+  sel.innerHTML = '<option value="">Todos</option>' + clientes.map(c => `<option>${c}</option>`).join('');
+  sel.value = current;
+}
+
+// FILTERS
+function applyFilters(){
+  const fc = document.getElementById('f-cliente').value;
+  const fo = document.getElementById('f-org').value;
+  const fe = document.getElementById('f-estado').value;
+  const fp = document.getElementById('f-pago').value;
+  const fb = document.getElementById('f-buscar').value.toLowerCase();
+
+  filteredData = allData.filter(r => {
+    if(fc && r.cliente !== fc) return false;
+    if(fo && r.organismo !== fo) return false;
+    if(fe && r.estado !== fe) return false;
+    if(fp && r.pago !== fp) return false;
+    if(fb && !`${r.cliente} ${r.tipo} ${r.datos} ${r.organismo}`.toLowerCase().includes(fb)) return false;
+    return true;
+  });
+
+  renderTable();
+}
+
+function clearFilters(){
+  document.getElementById('f-cliente').value = '';
+  document.getElementById('f-org').value = '';
+  document.getElementById('f-estado').value = '';
+  document.getElementById('f-pago').value = '';
+  document.getElementById('f-buscar').value = '';
+  applyFilters();
+}
+
+// RENDER TABLE
+function renderTable(){
+  document.getElementById('table-count').textContent = filteredData.length + ' trámites';
+  
+  if(filteredData.length === 0){
+    document.getElementById('table-content').innerHTML = '<div class="empty">No hay trámites que coincidan con los filtros.</div>';
+    return;
+  }
+
+  const html = `<table>
+    <thead>
+      <tr>
+        <th>Pedido</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Organismo</th>
+        <th>Tipo</th>
+        <th>Carácter</th>
+        <th>Honorario</th>
+        <th>Nro Entrada</th>
+        <th>Estado</th>
+        <th>Pago</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${filteredData.map(r => `
+        <tr>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--gold)">#${r.nroPedido}</td>
+          <td style="color:var(--text-dim)">${r.fecha}</td>
+          <td style="font-weight:500;color:var(--white)">${r.cliente}</td>
+          <td>${r.organismo}</td>
+          <td>${r.tipo}</td>
+          <td>${r.caracter}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--success)">${r.honorario}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim)">${r.entrada || '—'}</td>
+          <td>${badgeEstado(r.estado)}</td>
+          <td>${badgePago(r.pago)}</td>
+          <td>
+            <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})">✏️ Editar</button>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+  
+  document.getElementById('table-content').innerHTML = html;
+}
+
+function badgeEstado(e){
+  const map = {
+    'Pendiente': 'pendiente',
+    'En proceso': 'proceso',
+    'Listo': 'listo',
+    'Entregado': 'entregado'
+  };
+  return `<span class="badge badge-${map[e]||'pendiente'}">${e||'Pendiente'}</span>`;
+}
+
+function badgePago(p){
+  return p === 'Si' 
+    ? '<span class="badge badge-si">✓ Pagado</span>'
+    : '<span class="badge badge-no">✗ Pendiente</span>';
+}
+
+// MODAL
+function abrirModal(rowIndex){
+  editingRow = allData.find(r => r.rowIndex === rowIndex);
+  if(!editingRow) return;
+  
+  document.getElementById('modal-info').textContent = 
+    `Pedido #${editingRow.nroPedido} · ${editingRow.cliente} · ${editingRow.tipo} ${editingRow.caracter}`;
+  document.getElementById('edit-estado').value = editingRow.estado || 'Pendiente';
+  document.getElementById('edit-entrada').value = editingRow.entrada || '';
+  document.getElementById('edit-pago').value = editingRow.pago || 'No';
+  document.getElementById('edit-forma-pago').value = editingRow.formaPago || '';
+  document.getElementById('edit-obs').value = '';
+  document.getElementById('modal-editar').classList.add('active');
+}
+
+function cerrarModal(){
+  document.getElementById('modal-editar').classList.remove('active');
+  editingRow = null;
+}
+
+async function guardarCambios(){
+  if(!editingRow) return;
+  
+  const estado = document.getElementById('edit-estado').value;
+  const entrada = document.getElementById('edit-entrada').value;
+  const pago = document.getElementById('edit-pago').value;
+  const formaPago = document.getElementById('edit-forma-pago').value;
+
+  try {
+    // Update via Apps Script
+    const payload = {
+      accion: 'actualizarTramite',
+      rowIndex: editingRow.rowIndex,
+      estado: estado,
+      entrada: entrada,
+      pago: pago,
+      formaPago: formaPago
+    };
+
+    const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
+    await fetch(url);
+
+    // Update local data
+    editingRow.estado = estado;
+    editingRow.entrada = entrada;
+    editingRow.pago = pago;
+    editingRow.formaPago = formaPago;
+
+    cerrarModal();
+    updateStats();
+    applyFilters();
+    showToast('✓ Cambios guardados correctamente', 'success');
+  } catch(err) {
+    showToast('Error al guardar cambios', 'error');
+  }
+}
+
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('modal-editar').addEventListener('click', function(e){
+  if(e.target === this) cerrarModal();
+});
+
+// PIN input enter key
+document.getElementById('pin-input').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
