@@ -1106,25 +1106,20 @@ function confirmarPedido(){
     if(btn) btn.textContent = 'Subiendo archivos (0/' + archivosParaSubir.length + ')...';
     
     archivosParaSubir.forEach(function(archivo, idx){
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type': 'text/plain'},
-        body: JSON.stringify(archivo)
-      })
-      .then(function(){
-        subidos++;
-        if(btn) btn.textContent = 'Subiendo archivos (' + subidos + '/' + archivosParaSubir.length + ')...';
-        if(subidos === archivosParaSubir.length){
-          mostrarConfirmacion(btn, nroPedido, true);
+      if(btn) btn.textContent = 'Subiendo archivo ' + (idx+1) + ' de ' + archivosParaSubir.length + '...';
+      subirPDFEnChunks(
+        archivo.base64,
+        archivo.nombre,
+        nroPedido || 0,
+        (S.cliente.ap||'') + (S.cliente.nom?', '+S.cliente.nom:''),
+        function(ok, url){
+          subidos++;
+          if(btn) btn.textContent = 'Subiendo archivos (' + subidos + '/' + archivosParaSubir.length + ')...';
+          if(subidos === archivosParaSubir.length){
+            mostrarConfirmacion(btn, nroPedido, false);
+          }
         }
-      })
-      .catch(function(){
-        subidos++;
-        if(subidos === archivosParaSubir.length){
-          mostrarConfirmacion(btn, nroPedido, true);
-        }
-      });
+      );
     });
   });
 }
@@ -1402,6 +1397,57 @@ function enviarMail(){
     console.error('Error al abrir mail:',err);
     alert('No se pudo abrir el cliente de correo. Por favor copia los datos y envialos manualmente a lavalle.garone@gmail.com');
   }
+}
+
+
+function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, callback){
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+  var CHUNK_SIZE = 50000; // 50KB chunks
+  var chunks = [];
+  for(var i = 0; i < base64Data.length; i += CHUNK_SIZE){
+    chunks.push(base64Data.substring(i, i + CHUNK_SIZE));
+  }
+  var uploadId = Date.now() + '_' + Math.random().toString(36).substr(2,9);
+  var uploaded = 0;
+  
+  function uploadChunk(idx){
+    if(idx >= chunks.length){
+      // All chunks sent, finalize
+      var finalPayload = {
+        tipo: 'finalizar_archivo',
+        uploadId: uploadId,
+        nombre: nombreArchivo,
+        totalChunks: chunks.length,
+        nroPedido: nroPedido,
+        cliente: nombreCliente
+      };
+      fetch(SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(finalPayload)))
+        .then(function(r){ return r.json(); })
+        .then(function(d){ if(callback) callback(d.ok, d.url); })
+        .catch(function(){ if(callback) callback(false); });
+      return;
+    }
+    
+    var chunkPayload = {
+      tipo: 'chunk_archivo',
+      uploadId: uploadId,
+      chunkIndex: idx,
+      totalChunks: chunks.length,
+      data: chunks[idx]
+    };
+    
+    fetch(SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(chunkPayload)))
+      .then(function(){ 
+        uploaded++;
+        uploadChunk(idx + 1);
+      })
+      .catch(function(){
+        // Retry once
+        setTimeout(function(){ uploadChunk(idx); }, 1000);
+      });
+  }
+  
+  uploadChunk(0);
 }
 
 function enviarAGoogleSheets(callback){
