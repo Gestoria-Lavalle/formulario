@@ -11,8 +11,7 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const { base64, nombre, nroPedido, cliente } = body;
     
-    console.log('Received file:', nombre, 'for pedido:', nroPedido, 'cliente:', cliente);
-    console.log('Base64 length:', base64 ? base64.length : 0);
+    console.log('Received file:', nombre, 'Base64 length:', base64 ? base64.length : 0);
 
     if (!base64 || !nombre) {
       return { 
@@ -22,7 +21,6 @@ exports.handler = async (event) => {
     }
 
     const SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-    console.log('Script URL configured:', !!SCRIPT_URL);
     
     const payload = JSON.stringify({
       tipo: 'archivo_directo',
@@ -32,25 +30,59 @@ exports.handler = async (event) => {
       cliente: cliente || 'Sin nombre'
     });
 
-    console.log('Sending to Apps Script, payload size:', payload.length);
+    console.log('Payload size:', payload.length, 'bytes');
+
+    const url = new URL(SCRIPT_URL);
+    const postData = payload;
 
     const result = await new Promise((resolve, reject) => {
-      const encodedPayload = encodeURIComponent(payload);
-      const fullUrl = SCRIPT_URL + '?datos=' + encodedPayload;
-      const url = new URL(fullUrl);
-      
-      const req = https.get({
+      const options = {
         hostname: url.hostname,
-        path: url.pathname + url.search,
-        headers: { 'Content-Type': 'application/json' }
-      }, (res) => {
+        path: url.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+
+      const req = https.request(options, (res) => {
         let data = '';
         console.log('Response status:', res.statusCode);
+        
+        // Follow redirects
+        if (res.statusCode === 302 || res.statusCode === 301) {
+          const redirectUrl = new URL(res.headers.location);
+          console.log('Redirecting to:', redirectUrl.hostname);
+          
+          const redirReq = https.request({
+            hostname: redirectUrl.hostname,
+            path: redirectUrl.pathname + redirectUrl.search,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData)
+            }
+          }, (redirRes) => {
+            let redirData = '';
+            redirRes.on('data', chunk => redirData += chunk);
+            redirRes.on('end', () => {
+              console.log('Redirect response:', redirData.substring(0, 200));
+              try { resolve(JSON.parse(redirData)); }
+              catch(e) { resolve({ ok: true }); }
+            });
+          });
+          redirReq.on('error', reject);
+          redirReq.write(postData);
+          redirReq.end();
+          return;
+        }
+        
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
           console.log('Response data:', data.substring(0, 200));
           try { resolve(JSON.parse(data)); }
-          catch(e) { resolve({ ok: true, raw: data.substring(0, 100) }); }
+          catch(e) { resolve({ ok: true }); }
         });
       });
       
@@ -58,14 +90,17 @@ exports.handler = async (event) => {
         console.error('Request error:', err.message);
         reject(err);
       });
+      
       req.setTimeout(55000, () => { 
-        console.error('Request timeout');
         req.destroy(); 
         reject(new Error('Timeout')); 
       });
+      
+      req.write(postData);
+      req.end();
     });
 
-    console.log('Result:', JSON.stringify(result));
+    console.log('Result:', JSON.stringify(result).substring(0, 200));
 
     return {
       statusCode: 200,
