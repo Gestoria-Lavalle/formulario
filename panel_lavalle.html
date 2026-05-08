@@ -907,17 +907,21 @@ function applyFilters(){
     
     // Filtro por rango de fechas
     if(fd || fh){
-      // Parse fecha dd/MM/yyyy
-      const partes = r.fecha.split('/');
+      // Parse fecha dd/MM/yyyy -> Date
+      const partes = (r.fecha || '').split('/');
       if(partes.length === 3){
-        const fechaRow = new Date(partes[2], partes[1]-1, partes[0]);
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10) - 1;
+        const anio = parseInt(partes[2], 10);
+        const fechaRow = new Date(anio, mes, dia);
         if(fd){
-          const desde = new Date(fd);
+          const [ay, am, ad] = fd.split('-').map(Number);
+          const desde = new Date(ay, am-1, ad);
           if(fechaRow < desde) return false;
         }
         if(fh){
-          const hasta = new Date(fh);
-          hasta.setHours(23,59,59);
+          const [by, bm, bd] = fh.split('-').map(Number);
+          const hasta = new Date(by, bm-1, bd, 23, 59, 59);
           if(fechaRow > hasta) return false;
         }
       }
