@@ -565,46 +565,159 @@ tbody td {
     </div>
 
     <!-- FILTERS -->
-    <div class="filters-bar">
-      <div class="filter-group">
-        <span class="filter-label">Cliente</span>
-        <select class="filter-select" id="f-cliente" onchange="applyFilters()">
-          <option value="">Todos</option>
-        </select>
+    <div class="filters-bar" style="flex-direction:column;align-items:stretch;gap:14px">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <div class="filter-group">
+          <span class="filter-label">Cliente</span>
+          <select class="filter-select" id="f-cliente" onchange="applyFilters()">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Organismo</span>
+          <select class="filter-select" id="f-org" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>RPI-CABA</option>
+            <option>RPI-PBA</option>
+            <option>Catastro GCBA</option>
+            <option>ARBA</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Tipo</span>
+          <select class="filter-select" id="f-tipo" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Dominio</option>
+            <option>Inhibición</option>
+            <option>Frecuencia</option>
+            <option>Índice de Titularidad</option>
+            <option>Planos</option>
+            <option>Copia Asiento Registral</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Estado</span>
+          <select class="filter-select" id="f-estado" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Pendiente</option>
+            <option>En proceso</option>
+            <option>Listo</option>
+            <option>Entregado</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Pago</span>
+          <select class="filter-select" id="f-pago" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="No">No pagado</option>
+            <option value="Si">Pagado</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Buscar</span>
+          <input type="text" class="filter-input" id="f-buscar" placeholder="Nombre, datos..." oninput="applyFilters()" style="width:160px">
+        </div>
       </div>
-      <div class="filter-group">
-        <span class="filter-label">Organismo</span>
-        <select class="filter-select" id="f-org" onchange="applyFilters()">
-          <option value="">Todos</option>
-          <option>RPI-CABA</option>
-          <option>RPI-PBA</option>
-          <option>Catastro GCBA</option>
-          <option>ARBA</option>
-        </select>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-top:1px solid var(--border);padding-top:12px">
+        <div class="filter-group">
+          <span class="filter-label">Desde</span>
+          <input type="date" class="filter-input" id="f-desde" onchange="applyFilters()">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Hasta</span>
+          <input type="date" class="filter-input" id="f-hasta" onchange="applyFilters()">
+        </div>
+        <div class="filter-group" style="margin-left:8px">
+          <button class="btn-action btn-edit" onclick="setRango(7)" style="margin-right:6px">Últimos 7 días</button>
+          <button class="btn-action btn-edit" onclick="setRango(30)" style="margin-right:6px">Últimos 30 días</button>
+          <button class="btn-action btn-edit" onclick="setRango(90)">Últimos 90 días</button>
+        </div>
+        <button class="btn-clear" onclick="clearFilters()" style="margin-left:auto">✕ Limpiar filtros</button>
       </div>
-      <div class="filter-group">
-        <span class="filter-label">Estado</span>
-        <select class="filter-select" id="f-estado" onchange="applyFilters()">
-          <option value="">Todos</option>
-          <option>Pendiente</option>
-          <option>En proceso</option>
-          <option>Listo</option>
-          <option>Entregado</option>
-        </select>
+    </div>
+
+    <!-- RESUMEN FILTRADO -->
+    <div id="resumen-filtrado" style="display:none;margin-bottom:20px">
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:16px 20px">
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px">
+          📊 Resumen del filtrado actual
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+          <div style="text-align:center;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.05)">
+            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--white)" id="r-total">0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Total trámites</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(243,156,18,0.08);border-radius:8px;border:1px solid rgba(243,156,18,0.2)">
+            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#f39c12" id="r-pendiente">0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Pendientes</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(52,152,219,0.08);border-radius:8px;border:1px solid rgba(52,152,219,0.2)">
+            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#3498db" id="r-proceso">0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">En proceso</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid rgba(46,204,113,0.2)">
+            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#2ecc71" id="r-listo">0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Listos/Entregados</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid rgba(46,204,113,0.2)">
+            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#2ecc71" id="r-pagado">0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Pagados</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(231,76,60,0.08);border-radius:8px;border:1px solid rgba(231,76,60,0.2)">
+            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#e74c3c" id="r-nopagado">0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">No pagados</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid rgba(46,204,113,0.2)">
+            <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#2ecc71" id="r-honorario-cobrado">$0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Honorarios cobrados</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(231,76,60,0.08);border-radius:8px;border:1px solid rgba(231,76,60,0.2)">
+            <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#e74c3c" id="r-honorario-pendiente">$0</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Honorarios pendientes</div>
+          </div>
+        </div>
       </div>
-      <div class="filter-group">
-        <span class="filter-label">Pago</span>
-        <select class="filter-select" id="f-pago" onchange="applyFilters()">
-          <option value="">Todos</option>
-          <option value="No">No pagado</option>
-          <option value="Si">Pagado</option>
-        </select>
+    </div>
+
+    <!-- RESUMEN FILTRADO -->
+    <div id="resumen-filtrado" style="display:none;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pendientes</div>
+          <div id="r-pendiente" style="font-size:24px;font-weight:700;color:#f39c12;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">En Proceso</div>
+          <div id="r-proceso" style="font-size:24px;font-weight:700;color:#3498db;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Listos</div>
+          <div id="r-listo" style="font-size:24px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Entregados</div>
+          <div id="r-entregado" style="font-size:24px;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Cobrado</div>
+          <div id="r-cobrado" style="font-size:20px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ A Cobrar</div>
+          <div id="r-acobrar" style="font-size:20px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">📋 Total</div>
+          <div id="r-total-hon" style="font-size:20px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">$0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Trámites</div>
+          <div id="r-cantidad" style="font-size:24px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">0</div>
+        </div>
       </div>
-      <div class="filter-group">
-        <span class="filter-label">Buscar</span>
-        <input type="text" class="filter-input" id="f-buscar" placeholder="Nombre, tipo..." oninput="applyFilters()" style="width:160px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:12px;color:var(--text-dim)">
+        <span id="r-descripcion"></span>
       </div>
-      <button class="btn-clear" onclick="clearFilters()">✕ Limpiar</button>
     </div>
 
     <!-- TABLE -->
@@ -774,34 +887,167 @@ function updateClientFilter(){
 function applyFilters(){
   const fc = document.getElementById('f-cliente').value;
   const fo = document.getElementById('f-org').value;
+  const ft = document.getElementById('f-tipo').value;
   const fe = document.getElementById('f-estado').value;
   const fp = document.getElementById('f-pago').value;
   const fb = document.getElementById('f-buscar').value.toLowerCase();
+  const fd = document.getElementById('f-desde').value;
+  const fh = document.getElementById('f-hasta').value;
 
   filteredData = allData.filter(r => {
     if(fc && r.cliente !== fc) return false;
     if(fo && r.organismo !== fo) return false;
+    if(ft && r.tipo !== ft) return false;
     if(fe && r.estado !== fe) return false;
     if(fp && r.pago !== fp) return false;
     if(fb && !`${r.cliente} ${r.tipo} ${r.datos} ${r.organismo}`.toLowerCase().includes(fb)) return false;
+    
+    // Filtro por rango de fechas
+    if(fd || fh){
+      // Parse fecha dd/MM/yyyy
+      const partes = r.fecha.split('/');
+      if(partes.length === 3){
+        const fechaRow = new Date(partes[2], partes[1]-1, partes[0]);
+        if(fd){
+          const desde = new Date(fd);
+          if(fechaRow < desde) return false;
+        }
+        if(fh){
+          const hasta = new Date(fh);
+          hasta.setHours(23,59,59);
+          if(fechaRow > hasta) return false;
+        }
+      }
+    }
     return true;
   });
 
   renderTable();
 }
 
+function setRango(dias){
+  const hoy = new Date();
+  const desde = new Date();
+  desde.setDate(hoy.getDate() - dias);
+  document.getElementById('f-hasta').value = hoy.toISOString().split('T')[0];
+  document.getElementById('f-desde').value = desde.toISOString().split('T')[0];
+  applyFilters();
+}
+
 function clearFilters(){
   document.getElementById('f-cliente').value = '';
   document.getElementById('f-org').value = '';
+  document.getElementById('f-tipo').value = '';
   document.getElementById('f-estado').value = '';
   document.getElementById('f-pago').value = '';
   document.getElementById('f-buscar').value = '';
+  document.getElementById('f-desde').value = '';
+  document.getElementById('f-hasta').value = '';
   applyFilters();
 }
 
 // RENDER TABLE
+function updateResumenFiltrado(){
+  const resumen = document.getElementById('resumen-filtrado');
+  
+  // Show summary only when filters are active
+  const hasFilters = 
+    document.getElementById('f-cliente').value ||
+    document.getElementById('f-org').value ||
+    document.getElementById('f-tipo').value ||
+    document.getElementById('f-estado').value ||
+    document.getElementById('f-pago').value ||
+    document.getElementById('f-buscar').value ||
+    document.getElementById('f-desde').value ||
+    document.getElementById('f-hasta').value;
+  
+  if(!hasFilters || filteredData.length === 0){
+    resumen.style.display = 'none';
+    return;
+  }
+  
+  resumen.style.display = 'block';
+  
+  const total = filteredData.length;
+  const pendiente = filteredData.filter(r => r.estado === 'Pendiente').length;
+  const proceso = filteredData.filter(r => r.estado === 'En proceso').length;
+  const listo = filteredData.filter(r => r.estado === 'Listo' || r.estado === 'Entregado').length;
+  const pagado = filteredData.filter(r => r.pago === 'Si').length;
+  const noPagado = filteredData.filter(r => r.pago !== 'Si').length;
+  
+  let honCobrado = 0, honPendiente = 0;
+  filteredData.forEach(r => {
+    const hon = parseFloat((r.honorario||'0').replace(/[$\.]/g,'').replace(',','.')) || 0;
+    if(r.pago === 'Si') honCobrado += hon;
+    else honPendiente += hon;
+  });
+
+  document.getElementById('r-total').textContent = total;
+  document.getElementById('r-pendiente').textContent = pendiente;
+  document.getElementById('r-proceso').textContent = proceso;
+  document.getElementById('r-listo').textContent = listo;
+  document.getElementById('r-pagado').textContent = pagado;
+  document.getElementById('r-nopagado').textContent = noPagado;
+  document.getElementById('r-honorario-cobrado').textContent = '$' + honCobrado.toLocaleString('es-AR');
+  document.getElementById('r-honorario-pendiente').textContent = '$' + honPendiente.toLocaleString('es-AR');
+}
+
+function updateResumenFiltrado(){
+  const resumen = document.getElementById('resumen-filtrado');
+  if(filteredData.length === 0){
+    resumen.style.display = 'none';
+    return;
+  }
+  resumen.style.display = 'block';
+
+  const pendiente = filteredData.filter(r => r.estado === 'Pendiente').length;
+  const proceso = filteredData.filter(r => r.estado === 'En proceso').length;
+  const listo = filteredData.filter(r => r.estado === 'Listo').length;
+  const entregado = filteredData.filter(r => r.estado === 'Entregado').length;
+
+  let cobrado = 0, aCobrar = 0;
+  filteredData.forEach(r => {
+    const hon = parseFloat((r.honorario||'0').replace(/[$\.]/g,'').replace(',','.')) || 0;
+    if(r.pago === 'Si') cobrado += hon;
+    else aCobrar += hon;
+  });
+  const totalHon = cobrado + aCobrar;
+
+  document.getElementById('r-pendiente').textContent = pendiente;
+  document.getElementById('r-proceso').textContent = proceso;
+  document.getElementById('r-listo').textContent = listo;
+  document.getElementById('r-entregado').textContent = entregado;
+  document.getElementById('r-cobrado').textContent = '$' + cobrado.toLocaleString('es-AR');
+  document.getElementById('r-acobrar').textContent = '$' + aCobrar.toLocaleString('es-AR');
+  document.getElementById('r-total-hon').textContent = '$' + totalHon.toLocaleString('es-AR');
+  document.getElementById('r-cantidad').textContent = filteredData.length;
+
+  // Descripcion del filtro activo
+  const partes = [];
+  const fc = document.getElementById('f-cliente').value;
+  const fo = document.getElementById('f-org').value;
+  const ft = document.getElementById('f-tipo').value;
+  const fe = document.getElementById('f-estado').value;
+  const fp = document.getElementById('f-pago').value;
+  const fd = document.getElementById('f-desde').value;
+  const fh = document.getElementById('f-hasta').value;
+  if(fc) partes.push('Cliente: ' + fc);
+  if(fo) partes.push('Organismo: ' + fo);
+  if(ft) partes.push('Tipo: ' + ft);
+  if(fe) partes.push('Estado: ' + fe);
+  if(fp) partes.push('Pago: ' + (fp === 'Si' ? 'Pagado' : 'No pagado'));
+  if(fd) partes.push('Desde: ' + fd.split('-').reverse().join('/'));
+  if(fh) partes.push('Hasta: ' + fh.split('-').reverse().join('/'));
+  
+  const desc = partes.length > 0 
+    ? '🔍 Filtros activos: ' + partes.join(' · ') + ' · ' + filteredData.length + ' resultado' + (filteredData.length !== 1 ? 's' : '')
+    : '📋 Mostrando todos los trámites (' + filteredData.length + ' en total)';
+  document.getElementById('r-descripcion').textContent = desc;
+}
+
 function renderTable(){
   document.getElementById('table-count').textContent = filteredData.length + ' trámites';
+  updateResumenFiltrado();
   
   if(filteredData.length === 0){
     document.getElementById('table-content').innerHTML = '<div class="empty">No hay trámites que coincidan con los filtros.</div>';
