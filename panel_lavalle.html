@@ -673,12 +673,16 @@ tbody td {
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✗ No pagados</div>
           <div id="r-nopagado" style="font-size:22px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">0</div>
         </div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💸 Total Aranceles</div>
+          <div id="r-aranceles" style="font-size:18px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
+        </div>
         <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Cobrado</div>
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Hon. Cobrado</div>
           <div id="r-cobrado" style="font-size:18px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
         <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ A cobrar</div>
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ Hon. A cobrar</div>
           <div id="r-acobrar" style="font-size:18px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
@@ -935,9 +939,11 @@ function updateResumenFiltrado(){
   const pagado = filteredData.filter(r => r.pago === 'Si').length;
   const noPagado = filteredData.filter(r => r.pago !== 'Si').length;
 
-  let cobrado = 0, aCobrar = 0;
+  let cobrado = 0, aCobrar = 0, totalAranceles = 0;
   filteredData.forEach(r => {
     const hon = parseFloat((r.honorario||'').replace(/[$.]/g,'').replace(',','.')) || 0;
+    const ara = parseFloat((r.arancel||'').replace(/[$.]/g,'').replace(',','.')) || 0;
+    totalAranceles += ara;
     if(r.pago === 'Si') cobrado += hon;
     else aCobrar += hon;
   });
@@ -950,6 +956,7 @@ function updateResumenFiltrado(){
   document.getElementById('r-entregado').textContent = entregado;
   document.getElementById('r-pagado').textContent = pagado;
   document.getElementById('r-nopagado').textContent = noPagado;
+  document.getElementById('r-aranceles').textContent = '$' + totalAranceles.toLocaleString('es-AR');
   document.getElementById('r-cobrado').textContent = '$' + cobrado.toLocaleString('es-AR');
   document.getElementById('r-acobrar').textContent = '$' + aCobrar.toLocaleString('es-AR');
   document.getElementById('r-total-hon').textContent = '$' + totalHon.toLocaleString('es-AR');
@@ -999,7 +1006,9 @@ function renderTable(){
         <th>Organismo</th>
         <th>Tipo</th>
         <th>Carácter</th>
-        <th>Honorario</th>
+        <th style="text-align:right">Importe</th>
+        <th style="text-align:right">Arancel</th>
+        <th style="text-align:right">Honorario</th>
         <th>Nro Entrada</th>
         <th>Estado</th>
         <th>Pago</th>
@@ -1015,7 +1024,9 @@ function renderTable(){
           <td>${r.organismo}</td>
           <td>${r.tipo}</td>
           <td>${r.caracter}</td>
-          <td style="font-family:'JetBrains Mono',monospace;color:var(--success)">${r.honorario}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim);text-align:right">${r.importe}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:#e74c3c;text-align:right">${r.arancel}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--success);text-align:right">${r.honorario}</td>
           <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim)">${r.entrada || '—'}</td>
           <td>${badgeEstado(r.estado)}</td>
           <td>${badgePago(r.pago)}</td>
@@ -1130,9 +1141,9 @@ function generarReporte(){
 
   let honCobrado = 0, honPendiente = 0;
   filteredData.forEach(r => {
-    const hon = parseFloat((r.honorario||'').replace(/[$.]/g,'').replace(',','.')) || 0;
-    if(r.pago === 'Si') honCobrado += hon;
-    else honPendiente += hon;
+    const imp = parseFloat((r.importe||'').replace(/[$.]/g,'').replace(',','.')) || 0;
+    if(r.pago === 'Si') honCobrado += imp;
+    else honPendiente += imp;
   });
 
   const filas = filteredData.map(r => `
@@ -1144,7 +1155,7 @@ function generarReporte(){
       <td>${r.caracter}</td>
       <td>${r.entrada || '—'}</td>
       <td style="text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${r.estado==='Pendiente'?'#fff3cd':r.estado==='En proceso'?'#cce5ff':r.estado==='Listo'?'#d4edda':'#ffeeba'};color:${r.estado==='Pendiente'?'#856404':r.estado==='En proceso'?'#004085':r.estado==='Listo'?'#155724':'#856404'}">${r.estado}</span></td>
-      <td style="text-align:right">${r.honorario}</td>
+      <td style="text-align:right">${r.importe}</td>
       <td style="text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${r.pago==='Si'?'#d4edda':'#f8d7da'};color:${r.pago==='Si'?'#155724':'#721c24'}">${r.pago==='Si'?'✓ Pagado':'✗ Pendiente'}</span></td>
     </tr>
   `).join('');
@@ -1197,7 +1208,7 @@ function generarReporte(){
     <div class="total-card total"><div class="label">📋 Total honorarios</div><div class="valor">$${(honCobrado+honPendiente).toLocaleString('es-AR')}</div></div>
   </div>
   <table>
-    <thead><tr><th>Pedido</th><th>Fecha</th><th>Organismo</th><th>Tipo</th><th>Carácter</th><th>Nro Entrada</th><th>Estado</th><th style="text-align:right">Honorario</th><th style="text-align:center">Pago</th></tr></thead>
+    <thead><tr><th>Pedido</th><th>Fecha</th><th>Organismo</th><th>Tipo</th><th>Carácter</th><th>Nro Entrada</th><th>Estado</th><th style="text-align:right">Importe</th><th style="text-align:center">Pago</th></tr></thead>
     <tbody>${filas}</tbody>
   </table>
   <div style="text-align:center;margin-bottom:20px">
