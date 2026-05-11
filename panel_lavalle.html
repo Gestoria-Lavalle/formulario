@@ -637,87 +637,56 @@ tbody td {
     </div>
 
     <!-- RESUMEN FILTRADO -->
-    <div id="resumen-filtrado" style="display:none;margin-bottom:20px">
-      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:16px 20px">
-        <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px">
-          📊 Resumen del filtrado actual
+    <div id="resumen-filtrado" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">📊 Resumen del filtrado actual</div>
+        <button id="btn-reporte" onclick="generarReporte()" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;color:var(--navy);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer">
+          🖨️ Generar reporte
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total</div>
+          <div id="r-cantidad" style="font-size:22px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
-          <div style="text-align:center;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.05)">
-            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--white)" id="r-total">0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Total trámites</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(243,156,18,0.08);border-radius:8px;border:1px solid rgba(243,156,18,0.2)">
-            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#f39c12" id="r-pendiente">0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Pendientes</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(52,152,219,0.08);border-radius:8px;border:1px solid rgba(52,152,219,0.2)">
-            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#3498db" id="r-proceso">0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">En proceso</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid rgba(46,204,113,0.2)">
-            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#2ecc71" id="r-listo">0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Listos/Entregados</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid rgba(46,204,113,0.2)">
-            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#2ecc71" id="r-pagado">0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Pagados</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(231,76,60,0.08);border-radius:8px;border:1px solid rgba(231,76,60,0.2)">
-            <div style="font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#e74c3c" id="r-nopagado">0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">No pagados</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid rgba(46,204,113,0.2)">
-            <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#2ecc71" id="r-honorario-cobrado">$0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Honorarios cobrados</div>
-          </div>
-          <div style="text-align:center;padding:12px;background:rgba(231,76,60,0.08);border-radius:8px;border:1px solid rgba(231,76,60,0.2)">
-            <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#e74c3c" id="r-honorario-pendiente">$0</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Honorarios pendientes</div>
-          </div>
+        <div style="background:var(--card);border:1px solid rgba(243,156,18,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pendientes</div>
+          <div id="r-pendiente" style="font-size:22px;font-weight:700;color:#f39c12;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(52,152,219,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">En Proceso</div>
+          <div id="r-proceso" style="font-size:22px;font-weight:700;color:#3498db;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Listos</div>
+          <div id="r-listo" style="font-size:22px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Entregados</div>
+          <div id="r-entregado" style="font-size:22px;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✓ Pagados</div>
+          <div id="r-pagado" style="font-size:22px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✗ No pagados</div>
+          <div id="r-nopagado" style="font-size:22px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Cobrado</div>
+          <div id="r-cobrado" style="font-size:18px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ A cobrar</div>
+          <div id="r-acobrar" style="font-size:18px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Hon.</div>
+          <div id="r-total-hon" style="font-size:18px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">$0</div>
         </div>
       </div>
-    </div>
-
-    <!-- RESUMEN FILTRADO -->
-    <div id="resumen-filtrado" style="display:none;margin-bottom:20px">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pendientes</div>
-          <div id="r-pendiente" style="font-size:24px;font-weight:700;color:#f39c12;font-family:'JetBrains Mono',monospace">0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">En Proceso</div>
-          <div id="r-proceso" style="font-size:24px;font-weight:700;color:#3498db;font-family:'JetBrains Mono',monospace">0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Listos</div>
-          <div id="r-listo" style="font-size:24px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Entregados</div>
-          <div id="r-entregado" style="font-size:24px;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace">0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Cobrado</div>
-          <div id="r-cobrado" style="font-size:20px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ A Cobrar</div>
-          <div id="r-acobrar" style="font-size:20px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">📋 Total</div>
-          <div id="r-total-hon" style="font-size:20px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">$0</div>
-        </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center">
-          <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Trámites</div>
-          <div id="r-cantidad" style="font-size:24px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">0</div>
-        </div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:12px;color:var(--text-dim)">
-        <span id="r-descripcion"></span>
-      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-dim)" id="r-descripcion"></div>
     </div>
 
     <!-- TABLE -->
@@ -956,78 +925,34 @@ function clearFilters(){
 // RENDER TABLE
 function updateResumenFiltrado(){
   const resumen = document.getElementById('resumen-filtrado');
-  
-  // Show summary only when filters are active
-  const hasFilters = 
-    document.getElementById('f-cliente').value ||
-    document.getElementById('f-org').value ||
-    document.getElementById('f-tipo').value ||
-    document.getElementById('f-estado').value ||
-    document.getElementById('f-pago').value ||
-    document.getElementById('f-buscar').value ||
-    document.getElementById('f-desde').value ||
-    document.getElementById('f-hasta').value;
-  
-  if(!hasFilters || filteredData.length === 0){
-    resumen.style.display = 'none';
-    return;
-  }
-  
   resumen.style.display = 'block';
-  
+
   const total = filteredData.length;
-  const pendiente = filteredData.filter(r => r.estado === 'Pendiente').length;
-  const proceso = filteredData.filter(r => r.estado === 'En proceso').length;
-  const listo = filteredData.filter(r => r.estado === 'Listo' || r.estado === 'Entregado').length;
-  const pagado = filteredData.filter(r => r.pago === 'Si').length;
-  const noPagado = filteredData.filter(r => r.pago !== 'Si').length;
-  
-  let honCobrado = 0, honPendiente = 0;
-  filteredData.forEach(r => {
-    const hon = parseFloat((r.honorario||'0').replace(/[$\.]/g,'').replace(',','.')) || 0;
-    if(r.pago === 'Si') honCobrado += hon;
-    else honPendiente += hon;
-  });
-
-  document.getElementById('r-total').textContent = total;
-  document.getElementById('r-pendiente').textContent = pendiente;
-  document.getElementById('r-proceso').textContent = proceso;
-  document.getElementById('r-listo').textContent = listo;
-  document.getElementById('r-pagado').textContent = pagado;
-  document.getElementById('r-nopagado').textContent = noPagado;
-  document.getElementById('r-honorario-cobrado').textContent = '$' + honCobrado.toLocaleString('es-AR');
-  document.getElementById('r-honorario-pendiente').textContent = '$' + honPendiente.toLocaleString('es-AR');
-}
-
-function updateResumenFiltrado(){
-  const resumen = document.getElementById('resumen-filtrado');
-  if(filteredData.length === 0){
-    resumen.style.display = 'none';
-    return;
-  }
-  resumen.style.display = 'block';
-
   const pendiente = filteredData.filter(r => r.estado === 'Pendiente').length;
   const proceso = filteredData.filter(r => r.estado === 'En proceso').length;
   const listo = filteredData.filter(r => r.estado === 'Listo').length;
   const entregado = filteredData.filter(r => r.estado === 'Entregado').length;
+  const pagado = filteredData.filter(r => r.pago === 'Si').length;
+  const noPagado = filteredData.filter(r => r.pago !== 'Si').length;
 
   let cobrado = 0, aCobrar = 0;
   filteredData.forEach(r => {
-    const hon = parseFloat((r.honorario||'0').replace(/[$\.]/g,'').replace(',','.')) || 0;
+    const hon = parseFloat((r.honorario||'').replace(/[$.]/g,'').replace(',','.')) || 0;
     if(r.pago === 'Si') cobrado += hon;
     else aCobrar += hon;
   });
   const totalHon = cobrado + aCobrar;
 
+  document.getElementById('r-cantidad').textContent = total;
   document.getElementById('r-pendiente').textContent = pendiente;
   document.getElementById('r-proceso').textContent = proceso;
   document.getElementById('r-listo').textContent = listo;
   document.getElementById('r-entregado').textContent = entregado;
+  document.getElementById('r-pagado').textContent = pagado;
+  document.getElementById('r-nopagado').textContent = noPagado;
   document.getElementById('r-cobrado').textContent = '$' + cobrado.toLocaleString('es-AR');
   document.getElementById('r-acobrar').textContent = '$' + aCobrar.toLocaleString('es-AR');
   document.getElementById('r-total-hon').textContent = '$' + totalHon.toLocaleString('es-AR');
-  document.getElementById('r-cantidad').textContent = filteredData.length;
 
   // Descripcion del filtro activo
   const partes = [];
@@ -1047,9 +972,13 @@ function updateResumenFiltrado(){
   if(fh) partes.push('Hasta: ' + fh.split('-').reverse().join('/'));
   
   const desc = partes.length > 0 
-    ? '🔍 Filtros activos: ' + partes.join(' · ') + ' · ' + filteredData.length + ' resultado' + (filteredData.length !== 1 ? 's' : '')
-    : '📋 Mostrando todos los trámites (' + filteredData.length + ' en total)';
+    ? '🔍 Filtros activos: ' + partes.join(' · ') + ' — ' + total + ' resultado' + (total !== 1 ? 's' : '')
+    : '📋 Mostrando todos los trámites (' + total + ' en total)';
   document.getElementById('r-descripcion').textContent = desc;
+  
+  // Mostrar/ocultar botón reporte
+  const btnReporte = document.getElementById('btn-reporte');
+  if(btnReporte) btnReporte.style.display = total > 0 ? 'inline-flex' : 'none';
 }
 
 function renderTable(){
@@ -1190,6 +1119,99 @@ document.getElementById('modal-editar').addEventListener('click', function(e){
 document.getElementById('pin-input').addEventListener('keydown', function(e){
   if(e.key === 'Enter') doLogin();
 });
+
+function generarReporte(){
+  const fc = document.getElementById('f-cliente').value || 'Todos los clientes';
+  const fd = document.getElementById('f-desde').value;
+  const fh = document.getElementById('f-hasta').value;
+  const fechaDesde = fd ? fd.split('-').reverse().join('/') : '—';
+  const fechaHasta = fh ? fh.split('-').reverse().join('/') : '—';
+  const fechaReporte = new Date().toLocaleDateString('es-AR');
+
+  let honCobrado = 0, honPendiente = 0;
+  filteredData.forEach(r => {
+    const hon = parseFloat((r.honorario||'').replace(/[$.]/g,'').replace(',','.')) || 0;
+    if(r.pago === 'Si') honCobrado += hon;
+    else honPendiente += hon;
+  });
+
+  const filas = filteredData.map(r => `
+    <tr>
+      <td>#${r.nroPedido}</td>
+      <td>${r.fecha}</td>
+      <td>${r.organismo}</td>
+      <td>${r.tipo}</td>
+      <td>${r.caracter}</td>
+      <td>${r.entrada || '—'}</td>
+      <td style="text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${r.estado==='Pendiente'?'#fff3cd':r.estado==='En proceso'?'#cce5ff':r.estado==='Listo'?'#d4edda':'#ffeeba'};color:${r.estado==='Pendiente'?'#856404':r.estado==='En proceso'?'#004085':r.estado==='Listo'?'#155724':'#856404'}">${r.estado}</span></td>
+      <td style="text-align:right">${r.honorario}</td>
+      <td style="text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${r.pago==='Si'?'#d4edda':'#f8d7da'};color:${r.pago==='Si'?'#155724':'#721c24'}">${r.pago==='Si'?'✓ Pagado':'✗ Pendiente'}</span></td>
+    </tr>
+  `).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte — ${fc}</title>
+<style>
+  body { font-family: Arial, sans-serif; color: #1a2744; margin: 0; padding: 30px; font-size: 13px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #c9a84c; }
+  .logo { font-size: 22px; font-weight: 700; color: #1a2744; }
+  .logo span { color: #c9a84c; }
+  .logo small { display: block; font-size: 12px; font-weight: 400; color: #666; margin-top: 2px; }
+  .reporte-info { text-align: right; font-size: 12px; color: #666; }
+  .reporte-info strong { display: block; font-size: 16px; color: #1a2744; margin-bottom: 4px; }
+  .cliente-box { background: #f8f9fc; border: 1px solid #e0e4ed; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+  .cliente-box h3 { margin: 0 0 8px; font-size: 14px; color: #666; font-weight: 400; }
+  .cliente-box .nombre { font-size: 20px; font-weight: 700; color: #1a2744; }
+  .periodo { font-size: 13px; color: #666; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  th { background: #1a2744; color: #fff; padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 9px 12px; border-bottom: 1px solid #e0e4ed; }
+  tr:nth-child(even) td { background: #f8f9fc; }
+  .totales { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 30px; }
+  .total-card { border: 1px solid #e0e4ed; border-radius: 8px; padding: 16px; text-align: center; }
+  .total-card .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .total-card .valor { font-size: 22px; font-weight: 700; }
+  .cobrado { color: #155724; border-color: #c3e6cb; background: #f0fff4; }
+  .acobrar { color: #721c24; border-color: #f5c6cb; background: #fff5f5; }
+  .total { color: #1a2744; }
+  .footer { text-align: center; font-size: 11px; color: #999; border-top: 1px solid #e0e4ed; padding-top: 16px; margin-top: 20px; }
+  @media print { body { padding: 15px; } button { display: none !important; } }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">⚖️ Estudio Lavalle <span>&</span> Asoc.<small>Solicitud de Trámites Registrales</small></div>
+    <div class="reporte-info"><strong>Reporte de Trámites</strong>Fecha: ${fechaReporte}<br>Total: ${filteredData.length} trámite${filteredData.length!==1?'s':''}</div>
+  </div>
+  <div class="cliente-box">
+    <h3>Cliente</h3>
+    <div class="nombre">${fc}</div>
+    <div class="periodo">Período: ${fechaDesde} al ${fechaHasta}</div>
+  </div>
+  <div class="totales">
+    <div class="total-card cobrado"><div class="label">💰 Honorarios cobrados</div><div class="valor">$${honCobrado.toLocaleString('es-AR')}</div></div>
+    <div class="total-card acobrar"><div class="label">⏳ Honorarios a cobrar</div><div class="valor">$${honPendiente.toLocaleString('es-AR')}</div></div>
+    <div class="total-card total"><div class="label">📋 Total honorarios</div><div class="valor">$${(honCobrado+honPendiente).toLocaleString('es-AR')}</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Pedido</th><th>Fecha</th><th>Organismo</th><th>Tipo</th><th>Carácter</th><th>Nro Entrada</th><th>Estado</th><th style="text-align:right">Honorario</th><th style="text-align:center">Pago</th></tr></thead>
+    <tbody>${filas}</tbody>
+  </table>
+  <div style="text-align:center;margin-bottom:20px">
+    <button onclick="window.print()" style="padding:10px 24px;background:#1a2744;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;margin-right:10px">🖨️ Imprimir / Guardar PDF</button>
+    <button onclick="window.close()" style="padding:10px 24px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:14px;cursor:pointer">✕ Cerrar</button>
+  </div>
+  <div class="footer">Estudio Lavalle & Asoc. · lavalle.garone@gmail.com · gestorialavalle.com.ar</div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
 </script>
 </body>
 </html>
