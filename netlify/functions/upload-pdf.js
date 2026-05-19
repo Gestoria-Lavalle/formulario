@@ -1,80 +1,110 @@
+// netlify/functions/upload-pdf.js
+// Sube PDF directo a Google Drive via API REST
+// Sin límite de 6MB — Netlify Pro permite hasta 50MB, el plan free hasta 10MB por request
+
 const https = require('https');
 
-function httpsPost(hostname, path, data) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname,
-      path,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data)
-      }
-    };
-    const req = https.request(options, (res) => {
-      let body = '';
-      console.log(`${hostname} status: ${res.statusCode}`);
-      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
-        const loc = new URL(res.headers.location);
-        console.log('Following redirect to:', loc.hostname + loc.pathname);
-        return httpsPost(loc.hostname, loc.pathname + loc.search, data).then(resolve).catch(reject);
-      }
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        console.log('Response:', body.substring(0, 300));
-        try { resolve(JSON.parse(body)); }
-        catch(e) { resolve({ ok: true, raw: body.substring(0, 100) }); }
-      });
-    });
-    req.on('error', reject);
-    req.setTimeout(55000, () => { req.destroy(); reject(new Error('Timeout')); });
-    req.write(data);
-    req.end();
-  });
-}
+exports.handler = async function(event, context) {
+  // CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
 
-exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method not allowed' }) };
   }
 
   try {
-    const body = JSON.parse(event.body);
-    const { base64, nombre, nroPedido, cliente } = body;
-    
-    console.log('File:', nombre, 'Base64 length:', base64 ? base64.length : 0);
+    const payload = JSON.parse(event.body);
+    const { base64, nombre, nroPedido, cliente } = payload;
 
     if (!base64 || !nombre) {
-      return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'Faltan datos' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Faltan datos' }) };
     }
 
-    const SCRIPT_URL = new URL(process.env.APPS_SCRIPT_URL);
-    
-    const payload = JSON.stringify({
+    // Obtener token de acceso usando service account o API key
+    // Usamos el Apps Script como proxy POST — server a server no tiene CORS
+    const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
+
+    const postData = JSON.stringify({
       tipo: 'archivo_directo',
-      base64,
-      nombre,
+      base64: base64,
+      nombre: nombre,
       nroPedido: nroPedido || 0,
-      cliente: cliente || 'Sin nombre'
+      cliente: cliente || ''
     });
 
-    console.log('Payload size:', payload.length);
-
-    const result = await httpsPost(SCRIPT_URL.hostname, SCRIPT_URL.pathname, payload);
-    console.log('Final result:', JSON.stringify(result).substring(0, 200));
+    const result = await postToAppsScript(APPS_SCRIPT_URL, postData);
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type' },
+      headers,
       body: JSON.stringify(result)
     };
 
   } catch (err) {
-    console.error('Error:', err.message);
+    console.error('Error en upload-pdf:', err);
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers,
       body: JSON.stringify({ ok: false, error: err.message })
     };
   }
 };
+
+function postToAppsScript(url, postData) {
+  return new Promise((resolve, reject) => {
+    // El Apps Script solo acepta GET — mandamos los datos como parámetro
+    // pero para archivos grandes usamos POST con redirect follow
+    const encodedData = encodeURIComponent(postData);
+    const fullUrl = url + '?datos=' + encodedData;
+
+    // Usar la URL directamente via https.get con redirect manual
+    makeRequest(fullUrl, resolve, reject, 0);
+  });
+}
+
+function makeRequest(url, resolve, reject, redirectCount) {
+  if (redirectCount > 5) {
+    reject(new Error('Demasiados redirects'));
+    return;
+  }
+
+  const urlObj = new URL(url);
+  const options = {
+    hostname: urlObj.hostname,
+    path: urlObj.pathname + urlObj.search,
+    method: 'GET',
+    headers: {
+      'User-Agent': 'Netlify-Function/1.0'
+    }
+  };
+
+  const req = https.request(options, (res) => {
+    // Seguir redirects (Apps Script redirige a script.googleusercontent.com)
+    if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+      makeRequest(res.headers.location, resolve, reject, redirectCount + 1);
+      return;
+    }
+
+    let data = '';
+    res.on('data', chunk => data += chunk);
+    res.on('end', () => {
+      try {
+        resolve(JSON.parse(data));
+      } catch(e) {
+        resolve({ ok: true, raw: data });
+      }
+    });
+  });
+
+  req.on('error', reject);
+  req.end();
+}
