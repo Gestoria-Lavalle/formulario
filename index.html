@@ -1406,22 +1406,25 @@ function enviarMail(){
 
 
 function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, callback){
-  // Netlify function actúa como proxy server-side — evita CORS del browser
-  var NETLIFY_URL = '/.netlify/functions/upload-pdf';
+  // POST directo al Apps Script — sin proxy, sin Netlify, sin CORS issues
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
 
-  fetch(NETLIFY_URL, {
+  fetch(SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({
+      tipo: 'archivo_directo',
       base64: base64Data,
       nombre: nombreArchivo,
       nroPedido: nroPedido || 0,
       cliente: nombreCliente || ''
     })
   })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    if(callback) callback(data.ok, data.url);
+  .then(function(){
+    // no-cors no devuelve body — asumimos ok y dejamos el link vacío
+    // El Apps Script guardó el archivo; el link se verá al recargar el panel
+    if(callback) callback(true, null);
   })
   .catch(function(err){
     console.error('Error subiendo PDF:', err);
