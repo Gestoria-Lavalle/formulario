@@ -1406,30 +1406,76 @@ function enviarMail(){
 
 
 function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, callback){
-  // POST directo al Apps Script — sin proxy, sin Netlify, sin CORS issues
-  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+  // Sube directo a Google Drive API — sin CORS, sin redirects, sin límites
+  var DRIVE_FOLDER_ID = '1pAvMKAUcEuvhcF4Valbc7pzSUKkgtDPd';
+  var API_KEY = 'AIzaSyC1_FRVWDxAi39uYOWWwU8amK3i933-7zU';
 
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({
-      tipo: 'archivo_directo',
-      base64: base64Data,
-      nombre: nombreArchivo,
-      nroPedido: nroPedido || 0,
-      cliente: nombreCliente || ''
+  // Convertir base64 a Blob
+  var byteChars = atob(base64Data);
+  var byteNums = new Array(byteChars.length);
+  for(var i = 0; i < byteChars.length; i++){
+    byteNums[i] = byteChars.charCodeAt(i);
+  }
+  var byteArray = new Uint8Array(byteNums);
+  var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+  // Metadata del archivo en Drive
+  var metadata = {
+    name: (nroPedido ? 'Pedido_' + nroPedido + '_' : '') + nombreArchivo,
+    parents: [DRIVE_FOLDER_ID],
+    description: 'Cliente: ' + (nombreCliente || '') + ' | Pedido: ' + (nroPedido || '')
+  };
+
+  // Multipart upload a Drive API
+  var boundary = '-------lavalle_boundary';
+  var delimiter = '
+--' + boundary + '
+';
+  var closeDelim = '
+--' + boundary + '--';
+
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var b64 = e.target.result.split(',')[1];
+    var multipartBody =
+      delimiter +
+      'Content-Type: application/json
+
+' +
+      JSON.stringify(metadata) +
+      delimiter +
+      'Content-Type: application/pdf
+' +
+      'Content-Transfer-Encoding: base64
+
+' +
+      b64 +
+      closeDelim;
+
+    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=' + API_KEY, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+      },
+      body: multipartBody
     })
-  })
-  .then(function(){
-    // no-cors no devuelve body — asumimos ok y dejamos el link vacío
-    // El Apps Script guardó el archivo; el link se verá al recargar el panel
-    if(callback) callback(true, null);
-  })
-  .catch(function(err){
-    console.error('Error subiendo PDF:', err);
-    if(callback) callback(false);
-  });
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.id){
+        // Armar link de Drive
+        var url = 'https://drive.google.com/file/d/' + data.id + '/view';
+        if(callback) callback(true, url);
+      } else {
+        console.error('Drive API error:', data);
+        if(callback) callback(false);
+      }
+    })
+    .catch(function(err){
+      console.error('Error subiendo a Drive:', err);
+      if(callback) callback(false);
+    });
+  };
+  reader.readAsDataURL(blob);
 }
 
 
