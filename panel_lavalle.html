@@ -761,7 +761,7 @@ tbody td {
 <script>
 const PIN = '1403';
 const SHEET_ID = '1NgHGxB50WVhWIbSMMV40Oh6mnWOy7Ygoymqn9QIrSyE';
-let API_KEY = '';
+let API_KEY = 'AIzaSyBKY78P5z6rMuwoEp7oz16vozmQa-wPQrc';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
 
 let allData = [];
@@ -774,10 +774,7 @@ function doLogin(){
   if(pin === PIN){
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-panel').style.display = 'block';
-    fetch('/.netlify/functions/get-config')
-      .then(r => r.json())
-      .then(cfg => { API_KEY = cfg.apiKey; loadData(); })
-      .catch(() => { loadData(); });
+    loadData();
   } else {
     document.getElementById('login-error').textContent = 'PIN incorrecto';
     document.getElementById('pin-input').value = '';
