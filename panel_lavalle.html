@@ -1010,6 +1010,7 @@ function renderTable(){
         <th style="text-align:right">Arancel</th>
         <th style="text-align:right">Honorario</th>
         <th>Nro Entrada</th>
+        <th>PDF</th>
         <th>Estado</th>
         <th>Pago</th>
         <th>Acciones</th>
@@ -1028,6 +1029,7 @@ function renderTable(){
           <td style="font-family:'JetBrains Mono',monospace;color:#e74c3c;text-align:right">${r.arancel}</td>
           <td style="font-family:'JetBrains Mono',monospace;color:var(--success);text-align:right">${r.honorario}</td>
           <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim)">${r.entrada || '—'}</td>
+          <td>${badgePDF(r.archivo)}</td>
           <td>${badgeEstado(r.estado)}</td>
           <td>${badgePago(r.pago)}</td>
           <td>
@@ -1056,6 +1058,17 @@ function badgePago(p){
   return p === 'Si' 
     ? '<span class="badge badge-si">✓ Pagado</span>'
     : '<span class="badge badge-no">✗ Pendiente</span>';
+}
+
+function badgePDF(archivo){
+  if(!archivo) return '<span style="color:var(--text-dim);font-size:12px">—</span>';
+  // El campo puede ser texto plano, un link de Drive, o una fórmula HYPERLINK
+  var match = archivo.match(/https?:\/\/[^\s"')]+/);
+  if(match){
+    return '<a href="' + match[0] + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(52,152,219,0.15);color:#3498db;border:1px solid rgba(52,152,219,0.3);text-decoration:none">📄 Ver PDF</a>';
+  }
+  // Tiene nombre pero sin link — archivo registrado sin URL
+  return '<span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(243,156,18,0.15);color:#f39c12;border:1px solid rgba(243,156,18,0.3)">📎 ' + archivo.substring(0,20) + '</span>';
 }
 
 // MODAL
