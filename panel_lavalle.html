@@ -759,7 +759,7 @@ tbody td {
 <div class="toast" id="toast"></div>
 
 <script>
-const PIN = '1234'; // Cambiar por la clave deseada
+const PIN = '1403';
 const SHEET_ID = '1NgHGxB50WVhWIbSMMV40Oh6mnWOy7Ygoymqn9QIrSyE';
 let API_KEY = '';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
@@ -1032,7 +1032,7 @@ function renderTable(){
           <td>${badgePago(r.pago)}</td>
           <td>
             <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})">✏️ Editar</button>
-            <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\')}','${r.tipo}')" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">🗑️ Eliminar</button>
+            <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}')" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">🗑️ Eliminar</button>
           </td>
         </tr>
       `).join('')}
