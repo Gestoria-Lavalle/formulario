@@ -1107,6 +1107,7 @@ function confirmarPedido(){
     
     if(btn) btn.textContent = 'Subiendo archivos (0/' + archivosParaSubir.length + ')...';
     
+    var errores = 0;
     archivosParaSubir.forEach(function(archivo, idx){
       if(btn) btn.textContent = 'Subiendo archivo ' + (idx+1) + ' de ' + archivosParaSubir.length + '...';
       subirPDFEnChunks(
@@ -1116,9 +1117,11 @@ function confirmarPedido(){
         (S.cliente.ap||'') + (S.cliente.nom?', '+S.cliente.nom:''),
         function(ok, url){
           subidos++;
+          if(!ok) errores++;
           if(btn) btn.textContent = 'Subiendo archivos (' + subidos + '/' + archivosParaSubir.length + ')...';
           if(subidos === archivosParaSubir.length){
-            mostrarConfirmacion(btn, nroPedido, false);
+            // Si hubo errores al subir, mostrar aviso para enviar por WhatsApp
+            mostrarConfirmacion(btn, nroPedido, errores > 0);
           }
         }
       );
@@ -1403,20 +1406,21 @@ function enviarMail(){
 
 
 function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, callback){
-  var NETLIFY_URL = '/.netlify/functions/upload-pdf';
-  
+  // Sube directo al Apps Script — sin pasar por Netlify, sin límite de 6MB
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+
   var payload = {
+    tipo: 'archivo_directo',
     base64: base64Data,
     nombre: nombreArchivo,
     nroPedido: nroPedido || 0,
     cliente: nombreCliente || ''
   };
 
-  fetch(NETLIFY_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(payload)
-  })
+  var datosStr = encodeURIComponent(JSON.stringify(payload));
+  var url = SCRIPT_URL + '?datos=' + datosStr;
+
+  fetch(url, { method: 'GET' })
   .then(function(r){ return r.json(); })
   .then(function(data){
     if(callback) callback(data.ok, data.url);
