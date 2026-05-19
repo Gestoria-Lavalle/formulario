@@ -1427,46 +1427,35 @@ function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, c
   };
 
   // Multipart upload a Drive API
-  var boundary = '-------lavalle_boundary';
-  var delimiter = '
---' + boundary + '
-';
-  var closeDelim = '
---' + boundary + '--';
-
+  var boundary = 'lavalle_boundary_xyz';
+  var CRLF = '\r\n';
   var reader = new FileReader();
   reader.onload = function(e){
     var b64 = e.target.result.split(',')[1];
     var multipartBody =
-      delimiter +
-      'Content-Type: application/json
-
-' +
-      JSON.stringify(metadata) +
-      delimiter +
-      'Content-Type: application/pdf
-' +
-      'Content-Transfer-Encoding: base64
-
-' +
-      b64 +
-      closeDelim;
+      '--' + boundary + CRLF +
+      'Content-Type: application/json' + CRLF + CRLF +
+      JSON.stringify(metadata) + CRLF +
+      '--' + boundary + CRLF +
+      'Content-Type: application/pdf' + CRLF +
+      'Content-Transfer-Encoding: base64' + CRLF + CRLF +
+      b64 + CRLF +
+      '--' + boundary + '--';
 
     fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=' + API_KEY, {
       method: 'POST',
       headers: {
-        'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+        'Content-Type': 'multipart/related; boundary=' + boundary
       },
       body: multipartBody
     })
     .then(function(r){ return r.json(); })
     .then(function(data){
       if(data.id){
-        // Armar link de Drive
         var url = 'https://drive.google.com/file/d/' + data.id + '/view';
         if(callback) callback(true, url);
       } else {
-        console.error('Drive API error:', data);
+        console.error('Drive API error:', JSON.stringify(data));
         if(callback) callback(false);
       }
     })
@@ -1477,8 +1466,6 @@ function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, c
   };
   reader.readAsDataURL(blob);
 }
-
-
 function enviarAGoogleSheets(callback){
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
   
