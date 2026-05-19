@@ -1032,7 +1032,7 @@ function renderTable(){
           <td>${badgePago(r.pago)}</td>
           <td>
             <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})">✏️ Editar</button>
-            <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}')" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">🗑️ Eliminar</button>
+            <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}','${r.nroPedido}','${r.nroTramite}')" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">🗑️ Eliminar</button>
           </td>
         </tr>
       `).join('')}
@@ -1225,12 +1225,10 @@ function generarReporte(){
   w.document.close();
 }
 
-async function eliminarTramite(rowIndex, cliente, tipo){
-  // Primera confirmación
+async function eliminarTramite(rowIndex, cliente, tipo, nroPedido, nroTramite){
   if(!confirm('¿Eliminar el trámite "' + tipo + '" de ' + cliente + '?\n\nEsta acción no se puede deshacer.')){
     return;
   }
-  // Segunda confirmación
   if(!confirm('⚠️ CONFIRMACIÓN FINAL\n\n¿Estás seguro que querés eliminar este trámite?\nSe borrará permanentemente de la planilla.')){
     return;
   }
@@ -1238,14 +1236,20 @@ async function eliminarTramite(rowIndex, cliente, tipo){
   try {
     const payload = {
       accion: 'eliminarTramite',
-      rowIndex: rowIndex
+      rowIndex: rowIndex,
+      nroPedido: nroPedido,
+      nroTramite: nroTramite
     };
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
-    await fetch(url);
+    const resp = await fetch(url);
+    const result = await resp.json();
 
-    // Remove from local data
+    if(!result.ok){
+      showToast('Error: ' + (result.error || 'no se pudo eliminar'), 'error');
+      return;
+    }
+
     allData = allData.filter(r => r.rowIndex !== rowIndex);
-    // Recalculate rowIndex for rows below
     allData.forEach(r => {
       if(r.rowIndex > rowIndex) r.rowIndex--;
     });
