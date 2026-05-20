@@ -1119,8 +1119,20 @@ function confirmarPedido(){
           subidos++;
           if(!ok) errores++;
           if(btn) btn.textContent = 'Subiendo archivos (' + subidos + '/' + archivosParaSubir.length + ')...';
+          // Si subió OK y tenemos URL, registrarla en el Sheet
+          if(ok && url && nroPedido){
+            var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+            var payload = {
+              accion: 'actualizarArchivoPDF',
+              nroPedido: nroPedido,
+              nroTramite: idx + 1,
+              archivoUrl: url,
+              archivoNombre: archivo.nombre
+            };
+            fetch(SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload)))
+              .catch(function(e){ console.warn('No se pudo registrar URL del PDF:', e); });
+          }
           if(subidos === archivosParaSubir.length){
-            // Si hubo errores al subir, mostrar aviso para enviar por WhatsApp
             mostrarConfirmacion(btn, nroPedido, errores > 0);
           }
         }
