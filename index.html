@@ -647,7 +647,8 @@ function fDominioCABA(c){
     <button class="add-btn" onclick="addTit()">+ Agregar titular</button>
   </div>
   <div class="divider"></div>
-  <div class="field"><label>Observaciones</label><textarea id="f_obs" placeholder="Observaciones adicionales..."></textarea></div>`;
+  <div class="field"><label>Observaciones</label><textarea id="f_obs" placeholder="Observaciones adicionales..."></textarea></div>
+  ${fileUpload('dc_pdf','Adjuntar documentación (opcional)')}`;
 }
 
 function toggleSistCABA(){
@@ -708,7 +709,8 @@ function fInhCABA(c){
       <div class="field required"><label>Razón Social</label><input type="text" id="irs"></div>
       <div class="field required"><label>CUIT</label><input type="text" id="icut"></div>
     </div>
-  </div>`;
+  </div>
+  ${fileUpload('ic_pdf','Adjuntar documentación (opcional)')}`;
 }
 function toggleInhCABA(){const v=gv('itp');document.getElementById('inh_f').classList.toggle('hidden',v!=='f');document.getElementById('inh_j').classList.toggle('hidden',v!=='j');}
 
@@ -716,7 +718,8 @@ function toggleInhCABA(){const v=gv('itp');document.getElementById('inh_f').clas
 function fFrecCABA(c){
   c.innerHTML=`
   <div class="section-label">Matrícula del inmueble</div>
-  ${matVisual('fr')}`;
+  ${matVisual('fr')}
+  ${fileUpload('fc_pdf','Adjuntar documentación (opcional)')}`;
 }
 
 // INDICE TITULARIDAD CABA — una sola persona
@@ -744,7 +747,8 @@ function fIdxCABA(c){
       <div class="field required"><label>Razón Social</label><input type="text" id="irs"></div>
       <div class="field required"><label>CUIT</label><input type="text" id="icut"></div>
     </div>
-  </div>`;
+  </div>
+  ${fileUpload('ix_pdf','Adjuntar documentación (opcional)')}`;
 }
 
 // INFO 6 — solo dirección + UF opcional
@@ -762,7 +766,8 @@ function fInfo6(c){
   </div>
   <div id="i6_uf_blk" class="hidden" style="margin-top:10px">
     <div class="field"><label>Unidad Funcional (UF)</label><input type="text" id="i6_uf" placeholder="Ej: 7"></div>
-  </div>`;
+  </div>
+  ${fileUpload('i6_pdf','Adjuntar documentación (opcional)')}`;
 }
 function toggleInfo6PH(){
   document.getElementById('i6_uf_blk').classList.toggle('hidden',!gc('i6_ph'));
@@ -854,7 +859,8 @@ function fInhPBA(c){
     <div class="field" style="margin-bottom:10px"><label>Nombre sociedad <span style="font-weight:400">(sin tipo societario)</span></label><input type="text" id="pi_noms"></div>
     <div class="field required"><label>Denominación <span style="font-weight:400">(según estatuto)</span></label><input type="text" id="pi_den"></div>
   </div>
-  <div class="field" style="margin-top:10px"><label>Observaciones</label><input type="text" id="pi_obs"></div>`;
+  <div class="field" style="margin-top:10px"><label>Observaciones</label><input type="text" id="pi_obs"></div>
+  ${fileUpload('pi_pdf','Adjuntar documentación (opcional)')}`;
 }
 function toggleInhPBA(){const v=gv('pi_tp');document.getElementById('pi_f').classList.toggle('hidden',v!=='f');document.getElementById('pi_j').classList.toggle('hidden',v!=='j');}
 
@@ -864,7 +870,8 @@ function fFrecPBA(c){
   <div class="form-grid cols-2" style="margin-bottom:12px">
     <div class="field required"><label>Partido</label>${pSel('pf_part')}</div>
   </div>
-  ${matPBA('pfm')}`;
+  ${matPBA('pfm')}
+  ${fileUpload('pf_pdf','Adjuntar documentación (opcional)')}`;
 }
 
 function fCopiaAsientoPBA(c){
@@ -894,7 +901,8 @@ function fIdxPBA(c){
   <div class="form-grid cols-2">
     <div class="field required"><label>Tipo doc.</label><select id="pi2_tdoc"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option><option>CUIT</option></select></div>
     <div class="field required"><label>Número</label><input type="text" id="pi2_ndoc"></div>
-  </div>`;
+  </div>
+  ${fileUpload('pi2_pdf','Adjuntar documentación (opcional)')}`;
 }
 
 // CATASTRO GCBA
@@ -926,7 +934,8 @@ function fPlanosARBA(c){
   <div class="form-grid cols-2" style="margin-top:12px">
     <div class="field required"><label>Número de Plano</label><input type="text" id="ar_nro"></div>
     <div class="field required"><label>Año de Plano</label><input type="text" id="ar_anio"></div>
-  </div>`;
+  </div>
+  ${fileUpload('ar_pdf','Adjuntar documentación (opcional)')}`;
 }
 
 // ============================================================
@@ -1013,6 +1022,16 @@ function collectDatos(){
     d.partido=gv('ar_part');d.partida=gv('ar_partida');
     d.nc=ncVal('arn');d.nro=gv('ar_nro');d.anio=gv('ar_anio');
   }
+  // Adjunto genérico — cubre todos los trámites con campo de archivo
+  var allPdfIds = ['dc_pdf','ic_pdf','fc_pdf','ix_pdf','i6_pdf','ar_pdf','pi_pdf','pf_pdf','pi2_pdf'];
+  for(var pi=0; pi<allPdfIds.length; pi++){
+    var pid = allPdfIds[pi];
+    if(S.archivos && S.archivos[pid] && !d.archivoNombre){
+      d.archivoNombre = S.archivos[pid];
+      if(S.archivosBase64 && S.archivosBase64[pid]) d.archivoBase64 = S.archivosBase64[pid].base64;
+      break;
+    }
+  }
   return d;
 }
 
@@ -1083,12 +1102,13 @@ function confirmarPedido(){
     
     // Paso 2: Subir archivos PDF si los hay
     var archivosParaSubir = [];
-    S.tramites.forEach(function(tr){
+    S.tramites.forEach(function(tr, tramiteIdx){
       if(tr.archivoBase64 && tr.archivoNombre){
         archivosParaSubir.push({
           base64: tr.archivoBase64,
           nombre: tr.archivoNombre,
           nroPedido: nroPedido || 0,
+          nroTramite: tramiteIdx + 1, // índice real del trámite en el pedido
           cliente: (S.cliente.ap||'') + (S.cliente.nom?', '+S.cliente.nom:''),
           tipo: 'archivo'
         });
@@ -1125,7 +1145,7 @@ function confirmarPedido(){
             var payload = {
               accion: 'actualizarArchivoPDF',
               nroPedido: nroPedido,
-              nroTramite: idx + 1,
+              nroTramite: archivo.nroTramite || (idx + 1),
               archivoUrl: url,
               archivoNombre: archivo.nombre
             };
