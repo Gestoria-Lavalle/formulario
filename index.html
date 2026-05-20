@@ -1406,62 +1406,32 @@ function enviarMail(){
 
 
 function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, callback){
-  // Sube via iframe+form POST — evita CORS sin OAuth ni proxies
-  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+  // Sube via Render API — servidor Node.js propio, sin límites, sin CORS
+  var API_URL = 'https://lavalle-api.onrender.com/upload-pdf';
 
-  // Crear iframe oculto
-  var iframeName = 'upload_iframe_' + Date.now();
-  var iframe = document.createElement('iframe');
-  iframe.name = iframeName;
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
-
-  // Crear formulario oculto
-  var form = document.createElement('form');
-  form.method = 'POST';
-  form.action = SCRIPT_URL;
-  form.target = iframeName;
-  form.style.display = 'none';
-
-  // Campos del formulario
-  var campos = {
-    tipo: 'archivo_directo',
-    base64: base64Data,
-    nombre: nombreArchivo,
-    nroPedido: nroPedido || 0,
-    cliente: nombreCliente || ''
-  };
-
-  Object.keys(campos).forEach(function(key){
-    var input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = key;
-    input.value = campos[key];
-    form.appendChild(input);
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      base64: base64Data,
+      nombre: nombreArchivo,
+      nroPedido: nroPedido || 0,
+      cliente: nombreCliente || ''
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.ok){
+      if(callback) callback(true, data.url);
+    } else {
+      console.error('Error en API:', data.error);
+      if(callback) callback(false);
+    }
+  })
+  .catch(function(err){
+    console.error('Error subiendo PDF:', err);
+    if(callback) callback(false);
   });
-
-  document.body.appendChild(form);
-
-  // Escuchar cuando el iframe carga (respuesta del script)
-  var timeout = setTimeout(function(){
-    // Timeout de 30 segundos — asumir ok si no hubo error visible
-    cleanup();
-    if(callback) callback(true, null);
-  }, 30000);
-
-  iframe.onload = function(){
-    clearTimeout(timeout);
-    cleanup();
-    if(callback) callback(true, null);
-  };
-
-  function cleanup(){
-    try { document.body.removeChild(form); } catch(e){}
-    try { document.body.removeChild(iframe); } catch(e){}
-  }
-
-  // Enviar
-  form.submit();
 }
 function enviarAGoogleSheets(callback){
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
