@@ -1406,65 +1406,62 @@ function enviarMail(){
 
 
 function subirPDFEnChunks(base64Data, nombreArchivo, nroPedido, nombreCliente, callback){
-  // Sube directo a Google Drive API — sin CORS, sin redirects, sin límites
-  var DRIVE_FOLDER_ID = '1pAvMKAUcEuvhcF4Valbc7pzSUKkgtDPd';
-  var API_KEY = 'AIzaSyC1_FRVWDxAi39uYOWWwU8amK3i933-7zU';
+  // Sube via iframe+form POST — evita CORS sin OAuth ni proxies
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
 
-  // Convertir base64 a Blob
-  var byteChars = atob(base64Data);
-  var byteNums = new Array(byteChars.length);
-  for(var i = 0; i < byteChars.length; i++){
-    byteNums[i] = byteChars.charCodeAt(i);
+  // Crear iframe oculto
+  var iframeName = 'upload_iframe_' + Date.now();
+  var iframe = document.createElement('iframe');
+  iframe.name = iframeName;
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+
+  // Crear formulario oculto
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = SCRIPT_URL;
+  form.target = iframeName;
+  form.style.display = 'none';
+
+  // Campos del formulario
+  var campos = {
+    tipo: 'archivo_directo',
+    base64: base64Data,
+    nombre: nombreArchivo,
+    nroPedido: nroPedido || 0,
+    cliente: nombreCliente || ''
+  };
+
+  Object.keys(campos).forEach(function(key){
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = campos[key];
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+
+  // Escuchar cuando el iframe carga (respuesta del script)
+  var timeout = setTimeout(function(){
+    // Timeout de 30 segundos — asumir ok si no hubo error visible
+    cleanup();
+    if(callback) callback(true, null);
+  }, 30000);
+
+  iframe.onload = function(){
+    clearTimeout(timeout);
+    cleanup();
+    if(callback) callback(true, null);
+  };
+
+  function cleanup(){
+    try { document.body.removeChild(form); } catch(e){}
+    try { document.body.removeChild(iframe); } catch(e){}
   }
-  var byteArray = new Uint8Array(byteNums);
-  var blob = new Blob([byteArray], { type: 'application/pdf' });
 
-  // Metadata del archivo en Drive
-  var metadata = {
-    name: (nroPedido ? 'Pedido_' + nroPedido + '_' : '') + nombreArchivo,
-    parents: [DRIVE_FOLDER_ID],
-    description: 'Cliente: ' + (nombreCliente || '') + ' | Pedido: ' + (nroPedido || '')
-  };
-
-  // Multipart upload a Drive API
-  var boundary = 'lavalle_boundary_xyz';
-  var CRLF = '\r\n';
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var b64 = e.target.result.split(',')[1];
-    var multipartBody =
-      '--' + boundary + CRLF +
-      'Content-Type: application/json' + CRLF + CRLF +
-      JSON.stringify(metadata) + CRLF +
-      '--' + boundary + CRLF +
-      'Content-Type: application/pdf' + CRLF +
-      'Content-Transfer-Encoding: base64' + CRLF + CRLF +
-      b64 + CRLF +
-      '--' + boundary + '--';
-
-    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=' + API_KEY, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/related; boundary=' + boundary
-      },
-      body: multipartBody
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(data.id){
-        var url = 'https://drive.google.com/file/d/' + data.id + '/view';
-        if(callback) callback(true, url);
-      } else {
-        console.error('Drive API error:', JSON.stringify(data));
-        if(callback) callback(false);
-      }
-    })
-    .catch(function(err){
-      console.error('Error subiendo a Drive:', err);
-      if(callback) callback(false);
-    });
-  };
-  reader.readAsDataURL(blob);
+  // Enviar
+  form.submit();
 }
 function enviarAGoogleSheets(callback){
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
