@@ -452,8 +452,7 @@ header {
 
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
-const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
-const CLAUDE_KEY = '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';
+const CLAUDE_API = 'https://lavalle-api.onrender.com/chat';
 
 const PRECIOS = {
   'RPI-CABA': {
@@ -708,7 +707,7 @@ async function sendMessage() {
   try {
     const response = await fetch(CLAUDE_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1500,
