@@ -1060,7 +1060,7 @@ function renderTable(){
     <thead>
       <tr>
         <th>Pedido</th>
-        <th>Fecha</th>
+        <th style="width:90px">Fecha</th>
         <th>Cliente</th>
         <th>Organismo</th>
         <th>Tipo</th>
@@ -1072,7 +1072,7 @@ function renderTable(){
         <th>PDF</th>
         <th>Estado</th>
         <th>Pago</th>
-        <th>Acciones</th>
+        <th style="width:100px;min-width:100px">Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -1092,13 +1092,10 @@ function renderTable(){
           <td>${badgeEstado(r.estado)}</td>
           <td>${badgePago(r.pago)}</td>
           <td>
-            <div class="dropdown" style="position:relative;display:inline-block">
-              <button class="btn-action btn-edit" onclick="toggleDropdown(this)">Acciones ▾</button>
-              <div class="dropdown-menu" style="display:none;position:absolute;right:0;top:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:100;min-width:150px;overflow:hidden">
-                <div class="dropdown-item" onclick="verResumen(${r.rowIndex});closeDropdowns()" style="padding:10px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--text)">📋 Resumen</div>
-                <div class="dropdown-item" onclick="abrirModal(${r.rowIndex});closeDropdowns()" style="padding:10px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--text)">✏️ Editar</div>
-                <div class="dropdown-item" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}','${r.nroPedido}','${r.nroTramite}');closeDropdowns()" style="padding:10px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;color:#e74c3c">🗑️ Eliminar</div>
-              </div>
+            <div style="display:flex;gap:4px;flex-wrap:nowrap">
+              <button class="btn-action" onclick="verResumen(${r.rowIndex})" title="Ver resumen" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:5px 9px;font-size:13px">📋</button>
+              <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})" title="Editar" style="padding:5px 9px;font-size:13px">✏️</button>
+              <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}','${r.nroPedido}','${r.nroTramite}')" title="Eliminar" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3);padding:5px 9px;font-size:13px">🗑️</button>
             </div>
           </td>
         </tr>
