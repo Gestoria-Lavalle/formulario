@@ -711,29 +711,75 @@ tbody td {
 
 <!-- MODAL EDITAR -->
 <div class="modal-overlay" id="modal-editar">
-  <div class="modal">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
     <h3>✏️ Editar Trámite</h3>
     <div class="modal-sub" id="modal-info"></div>
-    <div class="form-group">
-      <label class="form-label">Estado</label>
-      <select class="form-control" id="edit-estado">
-        <option>Pendiente</option>
-        <option>En proceso</option>
-        <option>Listo</option>
-        <option>Entregado</option>
-      </select>
+    
+    <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--text-dim)">
+      📋 Campos marcados con * modifican el trámite. Los demás son datos operativos.
     </div>
-    <div class="form-group">
-      <label class="form-label">Nro de Entrada</label>
-      <input type="text" class="form-control" id="edit-entrada" placeholder="Ej: 2024-12345">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Organismo *</label>
+        <select class="form-control" id="edit-organismo">
+          <option>RPI-CABA</option>
+          <option>RPI-PBA</option>
+          <option>Catastro GCBA</option>
+          <option>ARBA</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <select class="form-control" id="edit-tipo">
+          <option>Dominio</option>
+          <option>Inhibición</option>
+          <option>Cesión</option>
+          <option>Frecuencia</option>
+          <option>Índice de Titularidad</option>
+          <option>Copia de Asiento</option>
+          <option>Planos</option>
+          <option>Info 6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carácter *</label>
+        <select class="form-control" id="edit-caracter">
+          <option>Simple</option>
+          <option>Urgente</option>
+          <option>Urgente Express</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select class="form-control" id="edit-estado">
+          <option>Pendiente</option>
+          <option>En proceso</option>
+          <option>Listo</option>
+          <option>Entregado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Importe ($) *</label>
+        <input type="number" class="form-control" id="edit-importe" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Arancel ($) *</label>
+        <input type="number" class="form-control" id="edit-arancel" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nro de Entrada</label>
+        <input type="text" class="form-control" id="edit-entrada" placeholder="Ej: 2024-12345">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pago</label>
+        <select class="form-control" id="edit-pago">
+          <option value="No">No pagado</option>
+          <option value="Si">Pagado</option>
+        </select>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Pago</label>
-      <select class="form-control" id="edit-pago">
-        <option value="No">No pagado</option>
-        <option value="Si">Pagado</option>
-      </select>
-    </div>
+    
     <div class="form-group" id="grupo-forma-pago">
       <label class="form-label">Forma de Pago</label>
       <select class="form-control" id="edit-forma-pago">
@@ -743,6 +789,10 @@ tbody td {
         <option>Mercado Pago</option>
         <option>Cheque</option>
       </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Datos del Trámite *</label>
+      <textarea class="form-control" id="edit-datos" rows="2" style="resize:vertical" placeholder="Datos específicos del trámite..."></textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Observaciones</label>
@@ -1074,11 +1124,17 @@ function abrirModal(rowIndex){
   if(!editingRow) return;
   
   document.getElementById('modal-info').textContent = 
-    `Pedido #${editingRow.nroPedido} · ${editingRow.cliente} · ${editingRow.tipo} ${editingRow.caracter}`;
+    `Pedido #${editingRow.nroPedido} · ${editingRow.cliente}`;
+  document.getElementById('edit-organismo').value = editingRow.organismo || 'RPI-CABA';
+  document.getElementById('edit-tipo').value = editingRow.tipo || 'Dominio';
+  document.getElementById('edit-caracter').value = editingRow.caracter || 'Simple';
   document.getElementById('edit-estado').value = editingRow.estado || 'Pendiente';
+  document.getElementById('edit-importe').value = editingRow.importe || 0;
+  document.getElementById('edit-arancel').value = editingRow.arancel || 0;
   document.getElementById('edit-entrada').value = editingRow.entrada || '';
   document.getElementById('edit-pago').value = editingRow.pago || 'No';
   document.getElementById('edit-forma-pago').value = editingRow.formaPago || '';
+  document.getElementById('edit-datos').value = editingRow.datos || '';
   document.getElementById('edit-obs').value = '';
   document.getElementById('modal-editar').classList.add('active');
 }
@@ -1090,36 +1146,56 @@ function cerrarModal(){
 
 async function guardarCambios(){
   if(!editingRow) return;
-  
-  const estado = document.getElementById('edit-estado').value;
-  const entrada = document.getElementById('edit-entrada').value;
-  const pago = document.getElementById('edit-pago').value;
-  const formaPago = document.getElementById('edit-forma-pago').value;
+
+  const organismo  = document.getElementById('edit-organismo').value;
+  const tipo       = document.getElementById('edit-tipo').value;
+  const caracter   = document.getElementById('edit-caracter').value;
+  const estado     = document.getElementById('edit-estado').value;
+  const importe    = parseFloat(document.getElementById('edit-importe').value) || 0;
+  const arancel    = parseFloat(document.getElementById('edit-arancel').value) || 0;
+  const entrada    = document.getElementById('edit-entrada').value;
+  const pago       = document.getElementById('edit-pago').value;
+  const formaPago  = document.getElementById('edit-forma-pago').value;
+  const datos      = document.getElementById('edit-datos').value;
+  const honorario  = importe - arancel;
 
   try {
-    // Update via Apps Script
     const payload = {
-      accion: 'actualizarTramite',
+      accion: 'actualizarTramiteCompleto',
       rowIndex: editingRow.rowIndex,
-      estado: estado,
-      entrada: entrada,
-      pago: pago,
-      formaPago: formaPago
+      nroPedido: editingRow.nroPedido,
+      nroTramite: editingRow.nroTramite,
+      organismo, tipo, caracter, estado,
+      importe, arancel, honorario,
+      entrada, pago, formaPago, datos
     };
 
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
-    await fetch(url);
+    const resp = await fetch(url);
+    const result = await resp.json();
 
-    // Update local data
-    editingRow.estado = estado;
-    editingRow.entrada = entrada;
-    editingRow.pago = pago;
+    if(!result.ok){
+      showToast('Error al guardar: ' + (result.error || ''), 'error');
+      return;
+    }
+
+    // Actualizar datos locales
+    editingRow.organismo = organismo;
+    editingRow.tipo      = tipo;
+    editingRow.caracter  = caracter;
+    editingRow.estado    = estado;
+    editingRow.importe   = importe;
+    editingRow.arancel   = arancel;
+    editingRow.honorario = honorario;
+    editingRow.entrada   = entrada;
+    editingRow.pago      = pago;
     editingRow.formaPago = formaPago;
+    editingRow.datos     = datos;
 
     cerrarModal();
     updateStats();
     applyFilters();
-    showToast('✓ Cambios guardados correctamente', 'success');
+    showToast('✓ Trámite actualizado correctamente', 'success');
   } catch(err) {
     showToast('Error al guardar cambios', 'error');
   }
