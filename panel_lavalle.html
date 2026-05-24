@@ -734,7 +734,7 @@ tbody td {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Organismo *</label>
-        <select class="form-control" id="edit-organismo">
+        <select class="form-control" id="edit-organismo" onchange="actualizarPreciosModal()">
           <option>RPI-CABA</option>
           <option>RPI-PBA</option>
           <option>Catastro GCBA</option>
@@ -743,7 +743,7 @@ tbody td {
       </div>
       <div class="form-group">
         <label class="form-label">Tipo *</label>
-        <select class="form-control" id="edit-tipo">
+        <select class="form-control" id="edit-tipo" onchange="actualizarPreciosModal()">
           <option>Dominio</option>
           <option>Inhibición</option>
           <option>Cesión</option>
@@ -756,7 +756,7 @@ tbody td {
       </div>
       <div class="form-group">
         <label class="form-label">Carácter *</label>
-        <select class="form-control" id="edit-caracter">
+        <select class="form-control" id="edit-caracter" onchange="actualizarPreciosModal()">
           <option>Simple</option>
           <option>Urgente</option>
           <option>Urgente Express</option>
@@ -822,6 +822,67 @@ tbody td {
 
 <script>
 const PIN = '1403';
+// TABLA DE PRECIOS (valores confirmados 2026)
+const PRECIOS_PANEL = {
+  'RPI-CABA': {
+    'Dominio Simple':                        { importe: 9000,  arancel: 6000  },
+    'Dominio Urgente':                       { importe: 22000, arancel: 18000 },
+    'Dominio Urgente Express':               { importe: 35000, arancel: 30000 },
+    'Inhibición Simple':                     { importe: 6000,  arancel: 3000  },
+    'Inhibición Urgente':                    { importe: 13000, arancel: 9000  },
+    'Inhibición Urgente Express':            { importe: 33000, arancel: 27000 },
+    'Frecuencia Simple':                     { importe: 6000,  arancel: 3000  },
+    'Índice de Titularidad Simple':          { importe: 6000,  arancel: 3000  },
+    'Índice de Titularidad Urgente':         { importe: 16000, arancel: 12000 },
+    'Info 6 Simple':                         { importe: 12000, arancel: 9000  },
+    'INFO 6 / Mat. y Gravámenes Simple':     { importe: 12000, arancel: 9000  },
+  },
+  'Catastro GCBA': {
+    'Planos Simple':                         { importe: 7000,  arancel: 0    },
+    'Cert. Info. Registral Simple':          { importe: 0,     arancel: 0    },
+  },
+  'RPI-PBA': {
+    'Dominio Simple':                        { importe: 29000,  arancel: 22300  },
+    'Dominio Urgente':                       { importe: 71500,  arancel: 62800  },
+    'Dominio Urgente Express':               { importe: 135000, arancel: 124900 },
+    'Inhibición Simple':                     { importe: 29000,  arancel: 22300  },
+    'Inhibición Urgente':                    { importe: 71500,  arancel: 62800  },
+    'Inhibición Urgente Express':            { importe: 135000, arancel: 124900 },
+    'Cesión Simple':                         { importe: 29000,  arancel: 22300  },
+    'Cesión Urgente':                        { importe: 71500,  arancel: 62800  },
+    'Cesión Urgente Express':                { importe: 135000, arancel: 124900 },
+    'Frecuencia Simple':                     { importe: 29000,  arancel: 20400  },
+    'Copia de Asiento Simple':               { importe: 29000,  arancel: 20400  },
+    'Copia de Asiento Urgente':              { importe: 65000,  arancel: 52200  },
+    'Copia de Asiento Urgente Express':      { importe: 125000, arancel: 114300 },
+    'Copia Asiento Registral Simple':        { importe: 29000,  arancel: 20400  },
+    'Copia Asiento Registral Urgente':       { importe: 65000,  arancel: 52200  },
+    'Copia Asiento Registral Urgente Express': { importe: 125000, arancel: 114300 },
+    'Índice de Titularidad Simple':          { importe: 29000,  arancel: 20400  },
+    'Índice de Titularidad Urgente':         { importe: 65000,  arancel: 52200  },
+    'Índice de Titularidad Urgente Express': { importe: 125000, arancel: 114300 },
+  },
+  'Catastro PBA': {
+    'Planos PH Simple':                      { importe: 13000, arancel: 0    },
+  },
+  'ARBA': {
+    'Planos PH Simple':                      { importe: 13000, arancel: 3658 },
+    'Planos Simple':                         { importe: 13000, arancel: 3658 },
+  }
+};
+
+function actualizarPreciosModal(){
+  const org = document.getElementById('edit-organismo').value;
+  const tipo = document.getElementById('edit-tipo').value;
+  const car = document.getElementById('edit-caracter').value;
+  const key = tipo + ' ' + car;
+  const precios = PRECIOS_PANEL[org] && PRECIOS_PANEL[org][key];
+  if(precios){
+    document.getElementById('edit-importe').value = precios.importe;
+    document.getElementById('edit-arancel').value = precios.arancel;
+  }
+}
+
 const SHEET_ID = '1NgHGxB50WVhWIbSMMV40Oh6mnWOy7Ygoymqn9QIrSyE';
 let API_KEY = 'AIzaSyC1_FRVWDxAi39uYOWWwU8amK3i933-7zU';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
