@@ -552,9 +552,9 @@ Cuando el cliente sube una escritura o DNI, extraé:
 - De título de propiedad: ídem escritura más datos de inscripción registral
 
 COMPORTAMIENTO:
-1. Saludá cordialmente — mensaje breve y directo
-2. Preguntá si ya tiene los datos o necesita ayuda, con 3 opciones claras
-3. Si tiene datos listos → derivá INMEDIATAMENTE al formulario: gestorialavalle.com.ar
+1. Saludá cordialmente y pedí INMEDIATAMENTE: apellido y nombre, empresa/inmobiliaria (opcional) y WhatsApp. Sin estos datos no podés registrar el pedido.
+2. Una vez que tenés los datos del cliente, preguntá si ya tiene los datos del trámite listos o necesita ayuda
+3. Si tiene datos listos → derivá al formulario: gestorialavalle.com.ar
 4. Si necesita ayuda → preguntá qué trámite necesita y guialo paso a paso
 5. Si sube documentos → analizalos, extraé los datos y confirmá con el cliente
 6. Cuando tenés todos los datos → generá el presupuesto con JSON. IMPORTANTE: solo mostrá el importe total al cliente, NO desglosar aranceles ni honorarios:
@@ -562,11 +562,17 @@ COMPORTAMIENTO:
 7. Después del presupuesto → datos bancarios para el pago
 8. Si el cliente quiere confirmar → pedile el comprobante
 
+DATOS DEL CLIENTE — formato JSON cuando los tengas:
+[CLIENTE_JSON]{"ap":"apellido","nom":"nombre","emp":"empresa opcional","tel":"whatsapp"}[/CLIENTE_JSON]
+Enviá este JSON en silencio (sin mencionarlo) en el mismo mensaje donde confirmás los datos del cliente.
+
 REGLAS IMPORTANTES:
 - Sé conciso — no hagas respuestas largas innecesarias
+- Pedí siempre nombre y WhatsApp al inicio — son obligatorios para registrar el pedido
 - Si el cliente tiene los datos → no lo retengas, mandalo al formulario
 - El formulario está en: gestorialavalle.com.ar (sin www)
 - Si el cliente pregunta por precios → respondé con los valores exactos de la tabla
+- Para inhibiciones: salvo que el cliente indique lo contrario, se solicitan a nombre de los COMPRADORES que figuran en la escritura
 - Si el cliente manda texto con datos → intentá identificar qué trámite necesita y extraé los datos automáticamente
 
 DATOS BANCARIOS DEL ESTUDIO:
@@ -774,27 +780,21 @@ async function sendMessage() {
     console.error(err);
   }
 
-  // Detectar si el usuario está dando sus datos de cliente
-  if (!pendingCliente && pendingPresupuesto) {
-    const txt = document.getElementById('userInput').value || '';
-    // Si el mensaje tiene nombre/apellido/tel — guardarlo como datos del cliente
-    const nombreMatch = txt.match(/([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/);
-    const telMatch = txt.match(/(15|11|15\d{8}|\d{8,10})/);
-    if (nombreMatch) {
-      const partes = nombreMatch[1].split(' ');
-      pendingCliente = {
-        ap: partes[0] || '',
-        nom: partes.slice(1).join(' ') || '',
-        tel: telMatch ? telMatch[0] : '',
-        tipo: 'particular'
-      };
-      mostrarDatosBancarios();
+  // Detectar CLIENTE_JSON en la respuesta del asistente
+  if (!pendingCliente && reply) {
+    const clienteMatch = reply.match(/\[CLIENTE_JSON\]([\s\S]*?)\[\/CLIENTE_JSON\]/);
+    if (clienteMatch) {
+      try {
+        pendingCliente = JSON.parse(clienteMatch[1].trim());
+        console.log('Cliente detectado:', pendingCliente);
+      } catch(e) { console.warn('Error parseando CLIENTE_JSON:', e); }
     }
   }
 
   // Detectar comprobante de pago
-  if (esperandoComprobante && pendingFile) {
+  if (esperandoComprobante && fileToSend) {
     await registrarPedidoEnSheet();
+  }
   }
 
   document.getElementById('sendBtn').disabled = false;
