@@ -1248,26 +1248,29 @@ async function guardarCambios(){
 
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
     
-    // Actualizar local inmediatamente — no esperamos respuesta del servidor
-    editingRow.organismo = organismo;
-    editingRow.tipo      = tipo;
-    editingRow.caracter  = caracter;
-    editingRow.estado    = estado;
-    editingRow.importe   = importe;
-    editingRow.arancel   = arancel;
-    editingRow.honorario = honorario;
-    editingRow.entrada   = entrada;
-    editingRow.pago      = pago;
-    editingRow.formaPago = formaPago;
-    editingRow.datos     = datos;
-
-    cerrarModal();
-    updateStats();
-    applyFilters();
-    showToast('✓ Trámite actualizado correctamente', 'success');
+    // Actualizar local ANTES de cerrar el modal
+    const rowToUpdate = editingRow;
+    rowToUpdate.organismo = organismo;
+    rowToUpdate.tipo      = tipo;
+    rowToUpdate.caracter  = caracter;
+    rowToUpdate.estado    = estado;
+    rowToUpdate.importe   = importe;
+    rowToUpdate.arancel   = arancel;
+    rowToUpdate.honorario = honorario;
+    rowToUpdate.entrada   = entrada;
+    rowToUpdate.pago      = pago;
+    rowToUpdate.formaPago = formaPago;
+    rowToUpdate.datos     = datos;
 
     // Mandar al servidor en segundo plano
     fetch(url).catch(() => {});
+
+    // Cerrar y re-renderizar con datos ya actualizados
+    document.getElementById('modal-editar').classList.remove('active');
+    editingRow = null;
+    updateStats();
+    applyFilters();
+    showToast('✓ Trámite actualizado correctamente', 'success');
 
   } catch(err) {
     showToast('Error al guardar cambios', 'error');
