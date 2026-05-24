@@ -961,7 +961,7 @@ function updateStats(){
   
   let cobrado = 0, aCobrar = 0;
   allData.forEach(r => {
-    const hon = parseFloat((r.honorario||'0').replace(/[$.]/g,'').replace(',','.')) || 0;
+    const hon = typeof r.honorario === 'number' ? r.honorario : parseFloat((String(r.honorario||'0')).replace(/[$.]/g,'').replace(',','.')) || 0;
     if(r.pago === 'Si') cobrado += hon;
     else aCobrar += hon;
   });
@@ -1064,8 +1064,8 @@ function updateResumenFiltrado(){
 
   let cobrado = 0, aCobrar = 0, totalAranceles = 0;
   filteredData.forEach(r => {
-    const hon = parseFloat((r.honorario||'').replace(/[$.]/g,'').replace(',','.')) || 0;
-    const ara = parseFloat((r.arancel||'').replace(/[$.]/g,'').replace(',','.')) || 0;
+    const hon = typeof r.honorario === 'number' ? r.honorario : parseFloat((String(r.honorario||'0')).replace(/[$.]/g,'').replace(',','.')) || 0;
+    const ara = typeof r.arancel === 'number' ? r.arancel : parseFloat((String(r.arancel||'0')).replace(/[$.]/g,'').replace(',','.')) || 0;
     totalAranceles += ara;
     if(r.pago === 'Si') cobrado += hon;
     else aCobrar += hon;
@@ -1391,7 +1391,7 @@ function generarReporte(){
 
   let honCobrado = 0, honPendiente = 0;
   filteredData.forEach(r => {
-    const imp = parseFloat((r.importe||'').replace(/[$.]/g,'').replace(',','.')) || 0;
+    const imp = typeof r.importe === 'number' ? r.importe : parseFloat((String(r.importe||'0')).replace(/[$.]/g,'').replace(',','.')) || 0;
     if(r.pago === 'Si') honCobrado += imp;
     else honPendiente += imp;
   });
