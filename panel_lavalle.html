@@ -1248,9 +1248,12 @@ async function guardarCambios(){
 
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
     const resp = await fetch(url);
-    const result = await resp.json();
 
-    if(!result.ok){
+    // Ser tolerante con la respuesta — el Apps Script a veces redirige
+    let result = { ok: true };
+    try { result = await resp.json(); } catch(e) { result = { ok: true }; }
+
+    if(result.ok === false){
       showToast('Error al guardar: ' + (result.error || ''), 'error');
       return;
     }
