@@ -1276,6 +1276,7 @@ async function guardarCambios(){
     showToast('✓ Trámite actualizado correctamente', 'success');
 
   } catch(err) {
+    console.error('guardarCambios error:', err, err.stack);
     showToast('Error al guardar cambios', 'error');
   }
 }
