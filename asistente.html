@@ -583,6 +583,8 @@ let conversation = [];
 let pendingFile = null;
 let pendingFileBase64 = null;
 let pendingPresupuesto = null;
+let pendingCliente = null; // datos del cliente para registrar el pedido
+let esperandoComprobante = false;
 
 // Inicializar
 window.onload = () => {
@@ -772,6 +774,29 @@ async function sendMessage() {
     console.error(err);
   }
 
+  // Detectar si el usuario está dando sus datos de cliente
+  if (!pendingCliente && pendingPresupuesto) {
+    const txt = document.getElementById('userInput').value || '';
+    // Si el mensaje tiene nombre/apellido/tel — guardarlo como datos del cliente
+    const nombreMatch = txt.match(/([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)+)/);
+    const telMatch = txt.match(/(15|11|15\d{8}|\d{8,10})/);
+    if (nombreMatch) {
+      const partes = nombreMatch[1].split(' ');
+      pendingCliente = {
+        ap: partes[0] || '',
+        nom: partes.slice(1).join(' ') || '',
+        tel: telMatch ? telMatch[0] : '',
+        tipo: 'particular'
+      };
+      mostrarDatosBancarios();
+    }
+  }
+
+  // Detectar comprobante de pago
+  if (esperandoComprobante && pendingFile) {
+    await registrarPedidoEnSheet();
+  }
+
   document.getElementById('sendBtn').disabled = false;
   setTimeout(scrollBottom, 100);
 }
@@ -828,34 +853,76 @@ async function confirmarPedido() {
   if (!pendingPresupuesto) return;
   
   addMessage('user', '✅ Confirmo el pedido');
-  showTyping();
 
-  // Mostrar datos bancarios
-  setTimeout(() => {
-    removeTyping();
-    const container = document.getElementById('chatContainer');
-    const div = document.createElement('div');
-    div.className = 'msg ai';
-    div.innerHTML = `
-      <div class="msg-avatar">L</div>
-      <div class="msg-bubble">
-        <strong>¡Perfecto!</strong> Para procesar tu pedido, realizá la transferencia por el monto total:<br><br>
-        <div class="bank-card">
-          <h4>💳 Datos para transferencia</h4>
-          <p><strong>Banco:</strong> Banco Ciudad</p>
-          <p><strong>Cuenta:</strong> Caja de Ahorro $ 000000520200348863</p>
-          <p><strong>CBU:</strong> 0290052010000003488639</p>
-          <p><strong>Alias:</strong> LAVALLE.ESTUDIO</p>
-          <p><strong>Titular:</strong> Mauro Raul Garone / Natalia Soledad Lavalle</p>
-          <p><strong>CUIT/CUIL:</strong> 20-26405610-2 / 23-29583017-4</p>
-          <p><strong>Monto:</strong> $${pendingPresupuesto.total.toLocaleString('es-AR')}</p>
-        </div>
-        <br>Una vez realizado el pago, adjuntá el comprobante acá y lo verificamos. 🙏
+  // Pedir datos del cliente si no los tenemos
+  if (!pendingCliente) {
+    addMessage('ai', '¡Perfecto! Antes de continuar necesito algunos datos para registrar el pedido.<br><br>Por favor indicame tu <strong>apellido y nombre</strong>, <strong>empresa/inmobiliaria</strong> (opcional) y <strong>WhatsApp</strong>.');
+    esperandoComprobante = false;
+    return;
+  }
+
+  mostrarDatosBancarios();
+}
+
+function mostrarDatosBancarios() {
+  const container = document.getElementById('chatContainer');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.innerHTML = `
+    <div class="msg-avatar">L</div>
+    <div class="msg-bubble">
+      <strong>¡Perfecto!</strong> Para procesar tu pedido, realizá la transferencia por el monto total:<br><br>
+      <div class="bank-card">
+        <h4>💳 Datos para transferencia</h4>
+        <p><strong>Banco:</strong> Banco Ciudad</p>
+        <p><strong>Cuenta:</strong> Caja de Ahorro $ 000000520200348863</p>
+        <p><strong>CBU:</strong> 0290052010000003488639</p>
+        <p><strong>Alias:</strong> LAVALLE.ESTUDIO</p>
+        <p><strong>Titular:</strong> Mauro Raul Garone / Natalia Soledad Lavalle</p>
+        <p><strong>CUIT/CUIL:</strong> 20-26405610-2 / 23-29583017-4</p>
+        <p><strong>Monto:</strong> <strong>$${pendingPresupuesto.total.toLocaleString('es-AR')}</strong></p>
       </div>
-    `;
-    container.appendChild(div);
-    scrollBottom();
-  }, 1000);
+      <br>Una vez realizado el pago, adjuntá el comprobante acá y lo verificamos. 🙏
+    </div>
+  `;
+  container.appendChild(div);
+  scrollBottom();
+  esperandoComprobante = true;
+}
+
+async function registrarPedidoEnSheet() {
+  if (!pendingPresupuesto || !pendingCliente) return;
+
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+
+  const tramites = pendingPresupuesto.tramites.map(t => ({
+    organismo: t.organismo,
+    tipo: t.tipo,
+    caracter: t.caracter,
+    importe: t.precio,
+    arancel: 0,
+    ...t.datos
+  }));
+
+  const payload = {
+    cliente: pendingCliente,
+    org: tramites[0]?.organismo || '',
+    tramites: tramites
+  };
+
+  try {
+    const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
+    const resp = await fetch(url);
+    const result = await resp.json();
+    if (result.ok) {
+      addMessage('ai', `✅ <strong>Pedido #${result.nroPedido} registrado correctamente.</strong><br><br>Natalia ya puede verlo en el panel y se pondrá en contacto para confirmar el pago y coordinar la entrega. ¡Gracias por confiar en el Estudio Lavalle!`);
+      pendingPresupuesto = null;
+      pendingCliente = null;
+      esperandoComprobante = false;
+    }
+  } catch(e) {
+    console.error('Error registrando pedido:', e);
+  }
 }
 </script>
 </body>
