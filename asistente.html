@@ -557,7 +557,7 @@ COMPORTAMIENTO:
 3. Si tiene datos listos → derivá INMEDIATAMENTE al formulario: gestorialavalle.com.ar
 4. Si necesita ayuda → preguntá qué trámite necesita y guialo paso a paso
 5. Si sube documentos → analizalos, extraé los datos y confirmá con el cliente
-6. Cuando tenés todos los datos → generá el presupuesto con JSON:
+6. Cuando tenés todos los datos → generá el presupuesto con JSON. IMPORTANTE: solo mostrá el importe total al cliente, NO desglosar aranceles ni honorarios:
    [PRESUPUESTO_JSON]{"tramites":[{"organismo":"...","tipo":"...","caracter":"...","datos":{...},"precio":0}],"total":0}[/PRESUPUESTO_JSON]
 7. Después del presupuesto → datos bancarios para el pago
 8. Si el cliente quiere confirmar → pedile el comprobante
@@ -795,10 +795,10 @@ function showPresupuesto(data) {
   const div = document.createElement('div');
   div.className = 'msg ai';
   
-  let itemsHtml = data.tramites.map(t => `
+  let itemsHtml = data.tramites.map((t, i) => `
     <div class="presupuesto-item">
-      <span>${t.organismo} — ${t.tipo} ${t.caracter}</span>
-      <span>$${t.precio.toLocaleString('es-AR')}</span>
+      <span>${i+1}. ${t.organismo} — ${t.tipo} ${t.caracter}</span>
+      <span><strong>$${t.precio.toLocaleString('es-AR')}</strong></span>
     </div>
   `).join('');
 
