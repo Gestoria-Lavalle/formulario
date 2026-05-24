@@ -886,6 +886,11 @@ function actualizarPreciosModal(){
   }
 }
 
+function fmtMoney(v){
+  const n = typeof v === 'number' ? v : parseFloat((String(v||'0')).replace(/[$.]/g,'').replace(',','.')) || 0;
+  return '$' + n.toLocaleString('es-AR');
+}
+
 const SHEET_ID = '1NgHGxB50WVhWIbSMMV40Oh6mnWOy7Ygoymqn9QIrSyE';
 let API_KEY = 'AIzaSyC1_FRVWDxAi39uYOWWwU8amK3i933-7zU';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
@@ -1148,9 +1153,9 @@ function renderTable(){
           <td>${r.organismo}</td>
           <td>${r.tipo}</td>
           <td>${r.caracter}</td>
-          <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim);text-align:right">${r.importe}</td>
-          <td style="font-family:'JetBrains Mono',monospace;color:#e74c3c;text-align:right">${r.arancel}</td>
-          <td style="font-family:'JetBrains Mono',monospace;color:var(--success);text-align:right">${r.honorario}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim);text-align:right">${fmtMoney(r.importe)}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:#e74c3c;text-align:right">${fmtMoney(r.arancel)}</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--success);text-align:right">${fmtMoney(r.honorario)}</td>
           <td style="font-family:'JetBrains Mono',monospace;color:var(--text-dim)">${r.entrada || '—'}</td>
           <td>${badgePDF(r.archivo)}</td>
           <td>${badgeEstado(r.estado)}</td>
@@ -1407,7 +1412,7 @@ function generarReporte(){
       <td>${r.caracter}</td>
       <td>${r.entrada || '—'}</td>
       <td style="text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${r.estado==='Pendiente'?'#fff3cd':r.estado==='En proceso'?'#cce5ff':r.estado==='Listo'?'#d4edda':'#ffeeba'};color:${r.estado==='Pendiente'?'#856404':r.estado==='En proceso'?'#004085':r.estado==='Listo'?'#155724':'#856404'}">${r.estado}</span></td>
-      <td style="text-align:right">${r.importe}</td>
+      <td style="text-align:right">${fmtMoney(r.importe)}</td>
       <td style="text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${r.pago==='Si'?'#d4edda':'#f8d7da'};color:${r.pago==='Si'?'#155724':'#721c24'}">${r.pago==='Si'?'✓ Pagado':'✗ Pendiente'}</span></td>
     </tr>
   `).join('');
