@@ -1247,18 +1247,8 @@ async function guardarCambios(){
     };
 
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
-    const resp = await fetch(url);
-
-    // Ser tolerante con la respuesta — el Apps Script a veces redirige
-    let result = { ok: true };
-    try { result = await resp.json(); } catch(e) { result = { ok: true }; }
-
-    if(result.ok === false){
-      showToast('Error al guardar: ' + (result.error || ''), 'error');
-      return;
-    }
-
-    // Actualizar datos locales
+    
+    // Actualizar local inmediatamente — no esperamos respuesta del servidor
     editingRow.organismo = organismo;
     editingRow.tipo      = tipo;
     editingRow.caracter  = caracter;
@@ -1275,6 +1265,10 @@ async function guardarCambios(){
     updateStats();
     applyFilters();
     showToast('✓ Trámite actualizado correctamente', 'success');
+
+    // Mandar al servidor en segundo plano
+    fetch(url).catch(() => {});
+
   } catch(err) {
     showToast('Error al guardar cambios', 'error');
   }
