@@ -710,6 +710,18 @@ tbody td {
 </div>
 
 <!-- MODAL EDITAR -->
+<!-- MODAL RESUMEN -->
+<div class="modal-overlay" id="modal-resumen">
+  <div class="modal" style="max-width:520px">
+    <h3>📋 Resumen del Trámite</h3>
+    <div id="resumen-content" style="font-size:14px;line-height:1.8"></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-secondary" onclick="cerrarResumen()">Cerrar</button>
+      <button class="btn-primary" onclick="copiarResumen()">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-editar">
   <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
     <h3>✏️ Editar Trámite</h3>
@@ -1080,6 +1092,7 @@ function renderTable(){
           <td>${badgeEstado(r.estado)}</td>
           <td>${badgePago(r.pago)}</td>
           <td>
+            <button class="btn-action" onclick="verResumen(${r.rowIndex})" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3)">📋 Resumen</button>
             <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})">✏️ Editar</button>
             <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}','${r.nroPedido}','${r.nroTramite}')" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">🗑️ Eliminar</button>
           </td>
@@ -1200,6 +1213,66 @@ async function guardarCambios(){
     showToast('Error al guardar cambios', 'error');
   }
 }
+
+// RESUMEN
+function verResumen(rowIndex){
+  const r = allData.find(x => x.rowIndex === rowIndex);
+  if(!r) return;
+
+  const honorario = (parseFloat(r.importe)||0) - (parseFloat(r.arancel)||0);
+
+  const lines = [
+    ['Pedido',     '#' + r.nroPedido + ' — Trámite ' + r.nroTramite],
+    ['Fecha',      r.fecha],
+    ['Cliente',    r.cliente],
+    ['Organismo',  r.organismo],
+    ['Tipo',       r.tipo],
+    ['Carácter',   r.caracter],
+    ['Importe',    '$' + (parseFloat(r.importe)||0).toLocaleString('es-AR')],
+    ['Arancel',    '$' + (parseFloat(r.arancel)||0).toLocaleString('es-AR')],
+    ['Honorario',  '$' + honorario.toLocaleString('es-AR')],
+    ['Datos',      r.datos],
+  ];
+
+  if(r.entrada) lines.push(['Nro Entrada', r.entrada]);
+  if(r.archivo && r.archivo.match(/https?:\/\//)) lines.push(['Archivo', r.archivo]);
+  lines.push(['Estado', r.estado]);
+  lines.push(['Pago', r.pago === 'Si' ? 'Pagado' + (r.formaPago ? ' — ' + r.formaPago : '') : 'Pendiente']);
+
+  const html = lines
+    .filter(l => l[1])
+    .map(l => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05)">
+      <span style="font-weight:600;color:var(--text-dim);min-width:110px;font-size:12px">${l[0]}</span>
+      <span style="color:var(--text)">${l[1]}</span>
+    </div>`).join('');
+
+  document.getElementById('resumen-content').innerHTML = html;
+  document.getElementById('modal-resumen').classList.add('active');
+}
+
+function cerrarResumen(){
+  document.getElementById('modal-resumen').classList.remove('active');
+}
+
+function copiarResumen(){
+  const r = allData.find(x => x.rowIndex === (window._resumenRow || 0));
+  // Copiar como texto plano
+  const divs = document.getElementById('resumen-content').querySelectorAll('div');
+  const texto = Array.from(divs).map(d => {
+    const spans = d.querySelectorAll('span');
+    return spans[0]?.textContent + ': ' + spans[1]?.textContent;
+  }).join('\n');
+  
+  navigator.clipboard.writeText(texto).then(() => {
+    showToast('✓ Resumen copiado al portapapeles', 'success');
+  }).catch(() => {
+    showToast('No se pudo copiar automáticamente', 'error');
+  });
+}
+
+document.getElementById('modal-resumen').addEventListener('click', function(e){
+  if(e.target === this) cerrarResumen();
+});
 
 function showToast(msg, type){
   const t = document.getElementById('toast');
