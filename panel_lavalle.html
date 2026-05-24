@@ -1208,8 +1208,10 @@ function abrirModal(rowIndex){
   document.getElementById('edit-tipo').value = editingRow.tipo || 'Dominio';
   document.getElementById('edit-caracter').value = editingRow.caracter || 'Simple';
   document.getElementById('edit-estado').value = editingRow.estado || 'Pendiente';
-  document.getElementById('edit-importe').value = editingRow.importe || 0;
-  document.getElementById('edit-arancel').value = editingRow.arancel || 0;
+  // Limpiar formato string ($9.000) para input numérico
+  const parseNum = v => typeof v === 'number' ? v : parseFloat((String(v||'0')).replace(/[$.]/g,'').replace(',','.')) || 0;
+  document.getElementById('edit-importe').value = parseNum(editingRow.importe);
+  document.getElementById('edit-arancel').value = parseNum(editingRow.arancel);
   document.getElementById('edit-entrada').value = editingRow.entrada || '';
   document.getElementById('edit-pago').value = editingRow.pago || 'No';
   document.getElementById('edit-forma-pago').value = editingRow.formaPago || '';
