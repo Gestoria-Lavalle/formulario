@@ -1092,9 +1092,9 @@ function renderTable(){
           <td>${badgeEstado(r.estado)}</td>
           <td>${badgePago(r.pago)}</td>
           <td>
-            <button class="btn-action" onclick="verResumen(${r.rowIndex})" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3)">📋 Resumen</button>
-            <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})">✏️ Editar</button>
-            <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}','${r.nroPedido}','${r.nroTramite}')" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)">🗑️ Eliminar</button>
+            <button class="btn-action" onclick="verResumen(${r.rowIndex})" title="Ver resumen" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:5px 8px">📋</button>
+            <button class="btn-action btn-edit" onclick="abrirModal(${r.rowIndex})" title="Editar trámite" style="padding:5px 8px">✏️</button>
+            <button class="btn-action" onclick="eliminarTramite(${r.rowIndex},'${r.cliente.replace(/'/g,'\u2019')}','${r.tipo}','${r.nroPedido}','${r.nroTramite}')" title="Eliminar trámite" style="background:rgba(231,76,60,0.2);color:#e74c3c;border:1px solid rgba(231,76,60,0.3);padding:5px 8px">🗑️</button>
           </td>
         </tr>
       `).join('')}
