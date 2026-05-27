@@ -795,7 +795,6 @@ async function sendMessage() {
   if (esperandoComprobante && fileToSend) {
     await registrarPedidoEnSheet();
   }
-  }
 
   document.getElementById('sendBtn').disabled = false;
   setTimeout(scrollBottom, 100);
