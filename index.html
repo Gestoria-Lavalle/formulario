@@ -206,6 +206,7 @@ main{width:100%;max-width:820px;padding:22px 20px 80px}
       <div class="option-card" onclick="selOrg('RPI-PBA',this)"><div class="icon">🏢</div><div class="name">RPI — Provincia</div><div class="desc">Registro de la Propiedad Inmueble<br>Provincia de Buenos Aires</div></div>
       <div class="option-card" onclick="selOrg('Catastro GCBA',this)"><div class="icon">🗺️</div><div class="name">Catastro GCBA</div><div class="desc">Gobierno de la Ciudad<br>de Buenos Aires</div></div>
       <div class="option-card" onclick="selOrg('ARBA',this)"><div class="icon">📋</div><div class="name">ARBA</div><div class="desc">Agencia de Recaudación<br>Provincia de Buenos Aires</div></div>
+      <div class="option-card" onclick="selOrg('Protocolos Notariales',this)"><div class="icon">📜</div><div class="name">Protocolos Notariales</div><div class="desc">Archivo de Protocolos<br>CABA / Provincia</div></div>
     </div>
     <div class="nav-row">
       <button class="btn btn-secondary" onclick="goStep(1)">← Volver</button>
@@ -299,6 +300,7 @@ const PRECIOS = {
   },
   'Catastro GCBA':{'Planos':{Simple:[0,7000]},'Cert. Info. Registral':{Simple:[0,0]}},
   'ARBA':{'Planos PH':{Simple:[3658,10000]}},
+  'Protocolos Notariales':{'Reglamento de Copropiedad':{Simple:[35000,80000]}},
 };
 
 const PARTIDOS=['001-Adolfo Alsina','002-Alberti','003-Almirante Brown','004-Avellaneda','005-Ayacucho','006-Azul','007-Bahía Blanca','008-Balcarce','009-Baradero','010-Arrecifes','011-Bolívar','012-Bragado','013-Cnel. Brandsen','014-Campana','015-Cañuelas','016-Carlos Casares','017-Carlos Tejedor','018-Carmen de Areco','019-Daireaux','020-Castelli','021-Colón','022-Cnel. Dorrego','023-Cnel. Pringles','024-Cnel. Suárez','025-Lanús','026-Chacabuco','027-Chascomús','028-Chivilcoy','029-Dolores','030-Esteban Echeverría','031-Exaltación de la Cruz','032-Florencio Varela','033-Gral. Alvarado','034-Gral. Alvear','035-Gral. Arenales','036-Gral. Belgrano','037-Gral. Guido','038-Zárate','039-Gral. Madariaga','040-Gral. Lamadrid','041-Gral. Las Heras','042-Gral. Lavalle','043-Gral. Paz','044-Gral. Pinto','045-Gral. Pueyrredón','046-Gral. Rodríguez','047-Gral. San Martín','048-Gral. Sarmiento','049-Gral. Viamonte','050-Gral. Villegas','051-Adolfo G. Chaves','052-Guaminí','053-Benito Juárez','054-Junín','055-La Plata','056-Laprida','057-Tigre','058-Las Flores','059-Leandro N. Alem','060-Lincoln','061-Lobería','062-Lobos','063-Lomas de Zamora','064-Luján','065-Magdalena','066-Maipú','067-Salto','068-Marcos Paz','069-Mar Chiquita','070-La Matanza','071-Mercedes','072-Merlo','073-Monte','074-Moreno','075-Navarro','076-Necochea','077-Nueve de Julio','078-Olavarría','079-Patagones','080-Pehuajó','081-Pellegrini','082-Pergamino','083-Pila','084-Pilar','085-Puán','086-Quilmes','087-Ramallo','088-Rauch','089-Rivadavia','090-Rojas','091-Roque Pérez','092-Saavedra','093-Saladillo','094-San Andrés de Giles','095-San Antonio de Areco','096-San Fernando','097-San Isidro','098-San Nicolás','099-San Pedro','100-San Vicente','101-Morón','102-Suipacha','103-Tandil','104-Tapalqué','105-Tordillo','106-Tornquist','107-Trenque Lauquen','108-Tres Arroyos','109-Veinticinco de Mayo','110-Vicente López','111-Villarino','112-Islas','113-Cnel. Rosales','114-Berisso','115-Ensenada','116-San Cayetano','117-Tres de Febrero','118-Escobar','119-Hipólito Yrigoyen','120-Berazategui','121-Capitán Sarmiento','122-Salliqueló','123-De la Costa','124-Pinamar','125-Villa Gesell','126-Monte Hermoso','127-Tres Lomas','128-Florentino Ameghino','129-Presidente Perón','130-Ezeiza','131-San Miguel','132-José C. Paz','133-Malvinas Argentinas','134-Punta Indio','135-Hurlingham','136-Ituzaingó','137-Lezama'];
@@ -413,7 +415,7 @@ function selOrg(org,el){
 // STEP 3
 // ============================================================
 function buildStep3(){
-  const subs={'RPI-CABA':'Trámites ante el Registro de la Propiedad Inmueble — Capital Federal.','RPI-PBA':'Trámites ante el Registro de la Propiedad Inmueble — Provincia de Buenos Aires.','Catastro GCBA':'Trámites ante Catastro del Gobierno de la Ciudad.','ARBA':'Trámites ante la Agencia de Recaudación de la Provincia de Buenos Aires.'};
+  const subs={'RPI-CABA':'Trámites ante el Registro de la Propiedad Inmueble — Capital Federal.','RPI-PBA':'Trámites ante el Registro de la Propiedad Inmueble — Provincia de Buenos Aires.','Catastro GCBA':'Trámites ante Catastro del Gobierno de la Ciudad.','ARBA':'Trámites ante la Agencia de Recaudación de la Provincia de Buenos Aires.','Protocolos Notariales':'Trámites ante el Archivo de Protocolos Notariales — CABA / Provincia.'};
   document.getElementById('sub3').textContent=subs[S.org]||'';
   const tipos=Object.keys(PRECIOS[S.org]);
   const c=document.getElementById('pills3');c.innerHTML='';
@@ -468,6 +470,7 @@ function buildStep5(){
   }
   if(o==='Catastro GCBA'&&t==='Planos')fPlanosGCBA(c);
   if(o==='ARBA'&&t==='Planos PH')fPlanosARBA(c);
+  if(o==='Protocolos Notariales'&&t==='Reglamento de Copropiedad')fReglamentoCopropiedad(c);
 }
 
 // ---- HELPERS ----
@@ -647,7 +650,8 @@ function fDominioCABA(c){
     <button class="add-btn" onclick="addTit()">+ Agregar titular</button>
   </div>
   <div class="divider"></div>
-  <div class="field"><label>Observaciones</label><textarea id="f_obs" placeholder="Observaciones adicionales..."></textarea></div>`;
+  <div class="field"><label>Observaciones</label><textarea id="f_obs" placeholder="Observaciones adicionales..."></textarea></div>
+  ${fileUpload('dc_pdf','Adjuntar escritura / título (PDF) — opcional')}`;
 }
 
 function toggleSistCABA(){
@@ -929,6 +933,17 @@ function fPlanosARBA(c){
   </div>`;
 }
 
+// PROTOCOLOS NOTARIALES
+function fReglamentoCopropiedad(c){
+  c.innerHTML=`
+  <div class="alert info">ℹ️ El importe es de referencia ($80.000 base) y puede variar según la cantidad de fojas del reglamento. El arancel estimado es de $35.000.</div>
+  <div class="field" style="margin-bottom:12px"><label>Dirección del inmueble (referencia)</label>
+    <input type="text" id="rc_dir" placeholder="Ej: Av. Corrientes 1234, CABA">
+  </div>
+  <div class="field"><label>Observaciones</label><textarea id="rc_obs" placeholder="Datos adicionales: escribano, fecha, cantidad de fojas si se conoce..."></textarea></div>
+  ${fileUpload('rc_pdf','Adjuntar Reglamento de Copropiedad (PDF) — opcional')}`;
+}
+
 // ============================================================
 // COLLECT + AGREGAR TRAMITE
 // ============================================================
@@ -949,6 +964,10 @@ function collectDatos(){
         d.nc=`C:${gv('fo_c')} S:${gv('fo_s')} M:${gv('fo_m')} P:${gv('fo_p')}`;
       }
       d.titulares=getTits();d.obs=gv('f_obs');
+      if(S.archivos['dc_pdf']){
+        d.archivoNombre=S.archivos['dc_pdf'];
+        if(S.archivosBase64&&S.archivosBase64['dc_pdf']) d.archivoBase64=S.archivosBase64['dc_pdf'].base64;
+      }
     }
     else if(t==='Inhibición'||t==='Índice de Titularidad'){
       const tp=gv('itp');
@@ -1012,6 +1031,13 @@ function collectDatos(){
   if(o==='ARBA'&&t==='Planos PH'){
     d.partido=gv('ar_part');d.partida=gv('ar_partida');
     d.nc=ncVal('arn');d.nro=gv('ar_nro');d.anio=gv('ar_anio');
+  }
+  if(o==='Protocolos Notariales'&&t==='Reglamento de Copropiedad'){
+    d.dir=gv('rc_dir');d.obs=gv('rc_obs');
+    if(S.archivos['rc_pdf']){
+      d.archivoNombre=S.archivos['rc_pdf'];
+      if(S.archivosBase64&&S.archivosBase64['rc_pdf']) d.archivoBase64=S.archivosBase64['rc_pdf'].base64;
+    }
   }
   return d;
 }
@@ -1258,6 +1284,12 @@ function generarResumen(){
       L.push(`  Partido : ${tr.partido} | Partida: ${tr.partida}`);
       L.push(`  NC      : ${tr.nc}`);
       L.push(`  Plano   : ${tr.nro}-${tr.anio}`);
+    }
+    if(o==='Protocolos Notariales'&&t==='Reglamento de Copropiedad'){
+      if(tr.dir)L.push(`  Dirección: ${tr.dir}`);
+      L.push(`  Nota    : Importe de referencia — puede variar según cantidad de fojas`);
+      if(tr.obs)L.push(`  Obs     : ${tr.obs}`);
+      if(tr.archivoNombre)L.push(`  Archivo : ${tr.archivoNombre}`);
     }
     L.push('  '+'·'.repeat(50));
   });
