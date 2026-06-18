@@ -864,16 +864,60 @@ function showPresupuesto(data) {
 
 async function confirmarPedido() {
   if (!pendingPresupuesto) return;
-  
-  addMessage('user', '✅ Confirmo el pedido');
 
-  // Pedir datos del cliente si no los tenemos
-  if (!pendingCliente) {
-    addMessage('ai', '¡Perfecto! Antes de continuar necesito algunos datos para registrar el pedido.<br><br>Por favor indicame tu <strong>apellido y nombre</strong>, <strong>empresa/inmobiliaria</strong> (opcional) y <strong>WhatsApp</strong>.');
-    esperandoComprobante = false;
+  // Si ya tenemos el cliente, registrar directo
+  if (pendingCliente) {
+    await registrarYMostrarBancarios();
     return;
   }
 
+  // Mostrar formulario inline para datos del cliente
+  const container = document.getElementById('chatContainer');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'form-cliente';
+  div.innerHTML = `
+    <div class="msg-avatar">L</div>
+    <div class="msg-bubble" style="max-width:85%">
+      <strong>¡Perfecto!</strong> Para registrar el pedido necesito algunos datos:<br><br>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <input type="text" id="fc-apellido" placeholder="Apellido *" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;outline:none">
+        <input type="text" id="fc-nombre" placeholder="Nombre *" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;outline:none">
+        <input type="text" id="fc-empresa" placeholder="Empresa / Inmobiliaria (opcional)" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;outline:none">
+        <input type="text" id="fc-tel" placeholder="WhatsApp *" inputmode="numeric" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;outline:none">
+        <button onclick="submitDatosCliente()" style="padding:11px;background:#0f1e3d;color:#c9a84c;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">
+          Registrar pedido →
+        </button>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  scrollBottom();
+  setTimeout(() => document.getElementById('fc-apellido')?.focus(), 100);
+}
+
+async function submitDatosCliente() {
+  const ap  = document.getElementById('fc-apellido')?.value.trim();
+  const nom = document.getElementById('fc-nombre')?.value.trim();
+  const emp = document.getElementById('fc-empresa')?.value.trim();
+  const tel = document.getElementById('fc-tel')?.value.trim();
+
+  if (!ap || !nom || !tel) {
+    alert('Por favor completá apellido, nombre y WhatsApp.');
+    return;
+  }
+
+  pendingCliente = { ap, nom, emp: emp || '', tel, tipo: 'particular' };
+  document.getElementById('form-cliente')?.remove();
+  addMessage('user', `${ap}, ${nom} — WA: ${tel}`);
+
+  await registrarYMostrarBancarios();
+}
+
+async function registrarYMostrarBancarios() {
+  showTyping();
+  await registrarPedidoEnSheet();
+  removeTyping();
   mostrarDatosBancarios();
 }
 
@@ -908,14 +952,35 @@ async function registrarPedidoEnSheet() {
 
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
 
-  const tramites = pendingPresupuesto.tramites.map(t => ({
-    organismo: t.organismo,
-    tipo: t.tipo,
-    caracter: t.caracter,
-    importe: t.precio,
-    arancel: 0,
-    ...t.datos
-  }));
+  // Tabla de aranceles para calcular correctamente
+  const ARANCELES = {
+    'RPI-CABA Dominio Simple': 6000, 'RPI-CABA Dominio Urgente': 18000, 'RPI-CABA Dominio Urgente Express': 30000,
+    'RPI-CABA Inhibición Simple': 3000, 'RPI-CABA Inhibición Urgente': 9000, 'RPI-CABA Inhibición Urgente Express': 27000,
+    'RPI-CABA Frecuencia Simple': 3000, 'RPI-CABA Índice de Titularidad Simple': 3000, 'RPI-CABA Índice de Titularidad Urgente': 12000,
+    'Catastro GCBA Planos Simple': 0,
+    'RPI-PBA Dominio Simple': 22300, 'RPI-PBA Dominio Urgente': 62800, 'RPI-PBA Dominio Urgente Express': 124900,
+    'RPI-PBA Inhibición Simple': 22300, 'RPI-PBA Inhibición Urgente': 62800, 'RPI-PBA Inhibición Urgente Express': 124900,
+    'RPI-PBA Cesión Simple': 22300, 'RPI-PBA Cesión Urgente': 62800, 'RPI-PBA Cesión Urgente Express': 124900,
+    'RPI-PBA Frecuencia Simple': 20400, 'RPI-PBA Copia de Asiento Simple': 20400,
+    'RPI-PBA Copia de Asiento Urgente': 52200, 'RPI-PBA Copia de Asiento Urgente Express': 114300,
+    'RPI-PBA Índice de Titularidad Simple': 20400, 'RPI-PBA Índice de Titularidad Urgente': 52200,
+    'RPI-PBA Índice de Titularidad Urgente Express': 114300,
+    'ARBA Planos PH Simple': 3658,
+    'Protocolos Notariales Reglamento de Copropiedad Simple': 35000,
+  };
+
+  const tramites = pendingPresupuesto.tramites.map(t => {
+    const key = `${t.organismo} ${t.tipo} ${t.caracter}`;
+    const arancel = ARANCELES[key] || 0;
+    return {
+      organismo: t.organismo,
+      tipo: t.tipo,
+      caracter: t.caracter,
+      importe: t.precio,
+      arancel: arancel,
+      ...(t.datos || {})
+    };
+  });
 
   const payload = {
     cliente: pendingCliente,
