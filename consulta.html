@@ -119,6 +119,7 @@ header {
 .tramite-titulo { font-weight:600; color:var(--navy); font-size:15px; }
 .tramite-pedido { font-size:12px; color:var(--text-dim); }
 .tramite-fecha { font-size:12px; color:var(--text-dim); margin-top:2px; }
+.tramite-referencia { font-size:13px; color:var(--navy); margin-top:4px; font-weight:500; }
 
 .badge {
   display:inline-block;
@@ -134,11 +135,33 @@ header {
 .badge-pago-si { background:#d1e7dd; color:#0f5132; }
 .badge-pago-no { background:#f8d7da; color:#842029; }
 
+.tramite-importe {
+  font-size:16px;
+  font-weight:600;
+  color:var(--navy);
+  white-space:nowrap;
+}
+
 .tramite-footer {
   display:flex;
   gap:8px;
   margin-top:10px;
 }
+
+.total-card {
+  background:var(--navy);
+  color:var(--white);
+  border-radius:14px;
+  padding:18px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+  font-weight:500;
+  margin-top:8px;
+}
+.total-monto { font-size:20px; font-weight:600; color:var(--gold); }
+.total-ok { justify-content:center; background:#0f5132; }
 
 .empty-state {
   text-align:center;
@@ -235,14 +258,20 @@ async function buscarTramites(){
       return;
     }
 
-    resultados.innerHTML = data.tramites.map(t => `
+    const totalPendiente = data.tramites
+      .filter(t => t.pago !== 'Si')
+      .reduce((sum, t) => sum + (parseFloat(t.importe) || 0), 0);
+
+    const tarjetas = data.tramites.map(t => `
       <div class="tramite-card">
         <div class="tramite-header">
           <div>
             <div class="tramite-titulo">${t.organismo} — ${t.tipo} ${t.caracter}</div>
+            ${t.referencia ? `<div class="tramite-referencia">📍 ${t.referencia}</div>` : ''}
             <div class="tramite-pedido">Pedido #${t.nroPedido}</div>
             <div class="tramite-fecha">${t.fecha}</div>
           </div>
+          <div class="tramite-importe">$${(parseFloat(t.importe)||0).toLocaleString('es-AR')}</div>
         </div>
         <div class="tramite-footer">
           ${badgeEstado(t.estado)}
@@ -250,6 +279,19 @@ async function buscarTramites(){
         </div>
       </div>
     `).join('');
+
+    const totalCard = totalPendiente > 0 ? `
+      <div class="total-card">
+        <span>Total pendiente de pago</span>
+        <span class="total-monto">$${totalPendiente.toLocaleString('es-AR')}</span>
+      </div>
+    ` : `
+      <div class="total-card total-ok">
+        <span>✓ No tenés pagos pendientes</span>
+      </div>
+    `;
+
+    resultados.innerHTML = tarjetas + totalCard;
 
   } catch(err) {
     resultados.innerHTML = `<div class="card"><div class="empty-state">Hubo un error al consultar. Por favor intentá de nuevo.</div></div>`;
