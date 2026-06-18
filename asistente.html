@@ -768,6 +768,17 @@ async function sendMessage() {
 
     removeTyping();
 
+    // Detectar CLIENTE_JSON en la respuesta del asistente
+    if (!pendingCliente && reply) {
+      const clienteMatch = reply.match(/\[CLIENTE_JSON\]([\s\S]*?)\[\/CLIENTE_JSON\]/);
+      if (clienteMatch) {
+        try {
+          pendingCliente = JSON.parse(clienteMatch[1].trim());
+          console.log('Cliente detectado:', pendingCliente);
+        } catch(e) { console.warn('Error parseando CLIENTE_JSON:', e); }
+      }
+    }
+
     // Verificar si hay presupuesto en la respuesta
     const presupMatch = reply.match(/\[PRESUPUESTO_JSON\](.*?)\[\/PRESUPUESTO_JSON\]/s);
     if (presupMatch) {
@@ -787,22 +798,6 @@ async function sendMessage() {
     removeTyping();
     addMessage('ai', 'Hubo un error de conexión. Por favor intentá de nuevo.');
     console.error(err);
-  }
-
-  // Detectar CLIENTE_JSON en la respuesta del asistente
-  if (!pendingCliente && reply) {
-    const clienteMatch = reply.match(/\[CLIENTE_JSON\]([\s\S]*?)\[\/CLIENTE_JSON\]/);
-    if (clienteMatch) {
-      try {
-        pendingCliente = JSON.parse(clienteMatch[1].trim());
-        console.log('Cliente detectado:', pendingCliente);
-      } catch(e) { console.warn('Error parseando CLIENTE_JSON:', e); }
-    }
-  }
-
-  // Detectar comprobante de pago
-  if (esperandoComprobante && fileToSend) {
-    await registrarPedidoEnSheet();
   }
 
   document.getElementById('sendBtn').disabled = false;
