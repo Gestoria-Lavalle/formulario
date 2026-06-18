@@ -905,31 +905,31 @@ async function submitDatosCliente() {
 }
 
 async function registrarYMostrarBancarios() {
+  const totalGuardado = pendingPresupuesto?.total || 0;
   showTyping();
   await registrarPedidoEnSheet();
   removeTyping();
-  mostrarDatosBancarios();
+  mostrarDatosBancarios(totalGuardado);
 }
 
-function mostrarDatosBancarios() {
+function mostrarDatosBancarios(total) {
+  const monto = total || 0;
   const container = document.getElementById('chatContainer');
   const div = document.createElement('div');
   div.className = 'msg ai';
   div.innerHTML = `
     <div class="msg-avatar">L</div>
     <div class="msg-bubble">
-      <strong>¡Perfecto!</strong> Para procesar tu pedido, realizá la transferencia por el monto total:<br><br>
+      Si querés abonar por adelantado, podés hacerlo por transferencia:<br><br>
       <div class="bank-card">
         <h4>💳 Datos para transferencia</h4>
         <p><strong>Banco:</strong> Banco Ciudad</p>
-        <p><strong>Cuenta:</strong> Caja de Ahorro $ 000000520200348863</p>
         <p><strong>CBU:</strong> 0290052010000003488639</p>
         <p><strong>Alias:</strong> LAVALLE.ESTUDIO</p>
         <p><strong>Titular:</strong> Mauro Raul Garone / Natalia Soledad Lavalle</p>
-        <p><strong>CUIT/CUIL:</strong> 20-26405610-2 / 23-29583017-4</p>
-        <p><strong>Monto:</strong> <strong>$${pendingPresupuesto.total.toLocaleString('es-AR')}</strong></p>
+        <p><strong>Monto:</strong> $${monto.toLocaleString('es-AR')}</p>
       </div>
-      <br>Una vez realizado el pago, adjuntá el comprobante acá y lo verificamos. 🙏
+      <br>El pago <strong>no es obligatorio</strong> para procesar el pedido. Natalia se pondrá en contacto a la brevedad. 🙏
     </div>
   `;
   container.appendChild(div);
@@ -966,6 +966,7 @@ async function registrarPedidoEnSheet() {
   const tramites = pendingPresupuesto.tramites.map(t => {
     const key = `${t.organismo} ${t.tipo} ${t.caracter}`;
     const arancel = ARANCELES[key] || 0;
+    console.log('Trámite key:', key, '→ arancel:', arancel);
     return {
       organismo: t.organismo,
       tipo: t.tipo,
