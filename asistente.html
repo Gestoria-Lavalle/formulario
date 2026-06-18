@@ -552,20 +552,15 @@ Cuando el cliente sube una escritura o DNI, extraé:
 - De título de propiedad: ídem escritura más datos de inscripción registral
 
 COMPORTAMIENTO:
-1. Saludá cordialmente y pedí INMEDIATAMENTE: apellido y nombre, empresa/inmobiliaria (opcional) y WhatsApp.
-2. Una vez que tenés los datos del cliente, preguntá si ya tiene los datos o documentos del trámite
+1. Saludá cordialmente con un mensaje breve. NO pedís datos del cliente al inicio — el sistema los captura automáticamente al confirmar el pedido.
+2. Preguntá directamente qué trámite necesita o si tiene documentación para adjuntar
 3. Si tiene datos listos → derivá al formulario: gestorialavalle.com.ar
 4. Si sube documentos → analizalos y extraé PROACTIVAMENTE todos los datos posibles
 5. Presentá un resumen de lo encontrado y los trámites sugeridos con precios totales
 6. Confirmá con el cliente con una sola pregunta: "¿Confirmás o querés modificar algo?"
-7. Con la confirmación → registrá el pedido INMEDIATAMENTE generando el JSON:
+7. Con la confirmación → generá el JSON del presupuesto:
    [PRESUPUESTO_JSON]{"tramites":[{"organismo":"...","tipo":"...","caracter":"...","datos":{...},"precio":0}],"total":0}[/PRESUPUESTO_JSON]
-8. Mostrá los datos bancarios pero aclará que el pago NO es obligatorio para registrar el pedido
-9. El pedido queda registrado igualmente — Natalia lo recibe en el panel y coordina internamente
-
-DATOS DEL CLIENTE — formato JSON cuando los tengas:
-[CLIENTE_JSON]{"ap":"apellido","nom":"nombre","emp":"empresa opcional","tel":"whatsapp"}[/CLIENTE_JSON]
-Enviá este JSON en silencio (sin mencionarlo) en el mismo mensaje donde confirmás los datos del cliente.
+8. Los datos del cliente y el registro del pedido se manejan automáticamente — no los menciones
 
 REGLAS PARA ESCRITURAS DE COMPRAVENTA:
 - COMPRADORES = quienes ADQUIEREN la propiedad → pedir Dominio + una Inhibición por cada comprador
@@ -948,7 +943,11 @@ function mostrarDatosBancarios() {
 }
 
 async function registrarPedidoEnSheet() {
-  if (!pendingPresupuesto || !pendingCliente) return;
+  console.log('registrarPedidoEnSheet - presupuesto:', pendingPresupuesto, 'cliente:', pendingCliente);
+  if (!pendingPresupuesto || !pendingCliente) {
+    console.error('Faltan datos para registrar:', { presupuesto: !!pendingPresupuesto, cliente: !!pendingCliente });
+    return;
+  }
 
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
 
@@ -990,16 +989,23 @@ async function registrarPedidoEnSheet() {
 
   try {
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
+    console.log('Enviando al Apps Script:', payload);
     const resp = await fetch(url);
-    const result = await resp.json();
+    let result;
+    try { result = await resp.json(); } catch(e) { result = { ok: false, error: 'No se pudo parsear respuesta' }; }
+    console.log('Respuesta Apps Script:', result);
     if (result.ok) {
-      addMessage('ai', `✅ <strong>Pedido #${result.nroPedido} registrado correctamente.</strong><br><br>Natalia ya puede verlo en el panel y se pondrá en contacto para confirmar el pago y coordinar la entrega. ¡Gracias por confiar en el Estudio Lavalle!`);
+      addMessage('ai', `✅ <strong>Pedido #${result.nroPedido} registrado correctamente.</strong><br><br>Natalia ya puede verlo en el panel y se pondrá en contacto a la brevedad. ¡Gracias por confiar en el Estudio Lavalle!`);
       pendingPresupuesto = null;
       pendingCliente = null;
       esperandoComprobante = false;
+    } else {
+      console.error('Error del Apps Script:', result.error);
+      addMessage('ai', 'Hubo un inconveniente al registrar el pedido. Por favor contactá al Estudio directamente.');
     }
   } catch(e) {
     console.error('Error registrando pedido:', e);
+    addMessage('ai', 'Error de conexión al registrar el pedido. Por favor intentá de nuevo.');
   }
 }
 </script>
