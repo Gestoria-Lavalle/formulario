@@ -623,12 +623,15 @@ CBU: 0290052010000003488639
 Alias: LAVALLE.ESTUDIO
 Titular: Mauro Raul Garone / Natalia Soledad Lavalle
 
-IMPORTANTE SOBRE PRECIOS:
+IMPORTANTE SOBRE PRECIOS Y MENSAJE DE PAGO:
 - Al cliente SOLO se le informa el PRECIO TOTAL del trámite
 - NUNCA mostrar ni mencionar aranceles, honorarios ni desgloses internos
 - Ejemplo correcto: "Dominio Simple: $9.000"
 - Ejemplo INCORRECTO: "Dominio Simple: $9.000 (arancel $6.000 + honorarios $3.000)"
-- El pago no condiciona el registro del pedido — NO mencionar esto al cliente
+- Cuando confirmés el pedido y mostrés los datos bancarios, usá este lenguaje EXACTO:
+  "Te paso los datos para que puedas realizar el depósito:"
+  [datos bancarios]
+- NUNCA decir "si preferís", "si querés abonar", "el pago no es obligatorio" — el cliente tiene que abonar los trámites
 
 Respondé siempre en español, con tono profesional pero cálido. Sé conciso. Si el cliente manda documentos, analizalos y extraé los datos relevantes para el trámite.`;
 
@@ -958,7 +961,7 @@ function mostrarDatosBancarios(total) {
   div.innerHTML = `
     <div class="msg-avatar">L</div>
     <div class="msg-bubble">
-      Te paso los datos de la cuenta para que puedas realizar el depósito:<br><br>
+      Te paso los datos para que puedas realizar el depósito:<br><br>
       <div class="bank-card">
         <h4>💳 Datos bancarios</h4>
         <p><strong>Banco:</strong> Banco Ciudad</p>
@@ -967,7 +970,6 @@ function mostrarDatosBancarios(total) {
         <p><strong>Titular:</strong> Mauro Raul Garone / Natalia Soledad Lavalle</p>
         <p><strong>Monto:</strong> $${monto.toLocaleString('es-AR')}</p>
       </div>
-      <br>Natalia se pondrá en contacto a la brevedad. 🙏
     </div>
   `;
   container.appendChild(div);
@@ -1023,7 +1025,8 @@ async function registrarPedidoEnSheet() {
 
   try {
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
-    console.log('Enviando al Apps Script:', payload);
+    console.log('Enviando al Apps Script:', JSON.stringify(payload, null, 2));
+    console.log('Trámites detalle:', payload.tramites.map(t => ({tipo: t.tipo, datos: t.datos})));
     const resp = await fetch(url);
     let result;
     try { result = await resp.json(); } catch(e) { result = { ok: false, error: 'No se pudo parsear respuesta' }; }
