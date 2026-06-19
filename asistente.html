@@ -641,6 +641,7 @@ let pendingFileBase64 = null;
 let pendingPresupuesto = null;
 let pendingCliente = null; // datos del cliente para registrar el pedido
 let esperandoComprobante = false;
+let adjuntoGuardado = null; // archivo adjunto para subir junto al pedido
 
 // Inicializar
 window.onload = () => {
@@ -760,6 +761,11 @@ async function sendMessage() {
   
   const fileToSend = pendingFile;
   const fileBase64 = pendingFileBase64;
+  // Guardar el archivo para adjuntarlo al pedido cuando se confirme
+  if (fileToSend && fileBase64) {
+    adjuntoGuardado = { nombre: fileToSend.name, base64: fileBase64, tipo: fileToSend.type };
+    console.log('Archivo guardado para adjuntar al pedido:', fileToSend.name);
+  }
   removeFile();
 
   document.getElementById('sendBtn').disabled = true;
@@ -1027,6 +1033,34 @@ async function registrarPedidoEnSheet() {
     const url = APPS_SCRIPT_URL + '?datos=' + encodeURIComponent(JSON.stringify(payload));
     console.log('Enviando al Apps Script:', JSON.stringify(payload, null, 2));
     console.log('Trámites detalle:', payload.tramites.map(t => ({tipo: t.tipo, datos: t.datos})));
+
+    // Si hay un archivo adjunto, subirlo a Drive primero
+    if (adjuntoGuardado) {
+      try {
+        const clienteNombre = (pendingCliente.ap || '') + (pendingCliente.nom ? ', ' + pendingCliente.nom : '');
+        const uploadResp = await fetch('https://lavalle-api.onrender.com/upload-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64: adjuntoGuardado.base64,
+            nombre: adjuntoGuardado.nombre,
+            nroPedido: 0, // se actualiza después
+            cliente: clienteNombre
+          })
+        });
+        const uploadResult = await uploadResp.json();
+        if (uploadResult.ok && uploadResult.url) {
+          // Agregar la URL del archivo al primer trámite
+          payload.tramites[0].archivoUrl = uploadResult.url;
+          payload.tramites[0].archivoNombre = adjuntoGuardado.nombre;
+          console.log('Archivo subido a Drive:', uploadResult.url);
+        }
+      } catch(e) {
+        console.warn('No se pudo subir el archivo adjunto:', e);
+      }
+      adjuntoGuardado = null;
+    }
+
     const resp = await fetch(url);
     let result;
     try { result = await resp.json(); } catch(e) { result = { ok: false, error: 'No se pudo parsear respuesta' }; }
