@@ -558,8 +558,41 @@ COMPORTAMIENTO:
 4. Si sube documentos → analizalos y extraé PROACTIVAMENTE todos los datos posibles
 5. Presentá un resumen de lo encontrado y los trámites sugeridos con precios totales
 6. Confirmá con el cliente con una sola pregunta: "¿Confirmás o querés modificar algo?"
-7. Con la confirmación → generá el JSON del presupuesto:
-   [PRESUPUESTO_JSON]{"tramites":[{"organismo":"...","tipo":"...","caracter":"...","datos":{...},"precio":0}],"total":0}[/PRESUPUESTO_JSON]
+7. Con la confirmación → generá el JSON del presupuesto con TODOS los datos de cada trámite:
+
+FORMATO DEL JSON POR TIPO DE TRÁMITE:
+
+Para Dominio CABA:
+[PRESUPUESTO_JSON]{"tramites":[{"organismo":"RPI-CABA","tipo":"Dominio","caracter":"Simple","datos":{"sist":"mat","circ":"5","mat":"12345","uf":"","dir":"Av. Corrientes 1234 CABA","titulares":"García Juan, López María"},"precio":9000}],"total":9000}[/PRESUPUESTO_JSON]
+
+Para Inhibición CABA (UNA por cada titular/comprador):
+[PRESUPUESTO_JSON]{"tramites":[{"organismo":"RPI-CABA","tipo":"Inhibición","caracter":"Simple","datos":{"ap":"García","nom":"Juan","tdoc":"DNI","ndoc":"25456789"},"precio":6000}],"total":6000}[/PRESUPUESTO_JSON]
+
+Para un pedido con Dominio + 2 Inhibiciones (ejemplo completo):
+[PRESUPUESTO_JSON]{"tramites":[{"organismo":"RPI-CABA","tipo":"Dominio","caracter":"Simple","datos":{"sist":"mat","circ":"5","mat":"12345","uf":"","dir":"Av. Corrientes 1234 CABA","titulares":"García Juan, López María"},"precio":9000},{"organismo":"RPI-CABA","tipo":"Inhibición","caracter":"Simple","datos":{"ap":"García","nom":"Juan","tdoc":"DNI","ndoc":"25456789"},"precio":6000},{"organismo":"RPI-CABA","tipo":"Inhibición","caracter":"Simple","datos":{"ap":"López","nom":"María","tdoc":"DNI","ndoc":"28123456"},"precio":6000}],"total":21000}[/PRESUPUESTO_JSON]
+
+FORMATO DE MATRÍCULA RPI-CABA:
+La matrícula aparece como "FR 10-270/6" que significa: circunscripción=10, número=270, UF=6.
+Formato: FR [circunscripción]-[número]/[UF] — si no hay barra, no hay UF.
+Ejemplos: "FR 10-270/6" → circ=10, mat=270, uf=6 / "FR 5-12345" → circ=5, mat=12345, uf=""
+
+EJEMPLO REAL DE PEDIDO Y JSON CORRECTO:
+
+Cliente envía:
+"Dirección: Pichincha 84, 3er piso UF 6, CABA
+Matrícula: FR 10-270/6
+Nomenclatura Catastral: Circunscripción 10, sección 20, manzana 42, parcela 20
+Titulares: Luis Nicolas Domingo Caroprese DNI 6.747.395 y Mercedes Teodomira Acuña DNI 1.132.843"
+
+JSON correcto a generar (Dominio + 2 Inhibiciones):
+[PRESUPUESTO_JSON]{"tramites":[{"organismo":"RPI-CABA","tipo":"Dominio","caracter":"Simple","datos":{"sist":"mat","circ":"10","mat":"270","uf":"6","dir":"Pichincha 84 3er piso UF 6 CABA","titulares":"Caroprese Luis Nicolas Domingo, Acuña Mercedes Teodomira"},"precio":9000},{"organismo":"RPI-CABA","tipo":"Inhibición","caracter":"Simple","datos":{"ap":"Caroprese","nom":"Luis Nicolas Domingo","tdoc":"DNI","ndoc":"6747395"},"precio":6000},{"organismo":"RPI-CABA","tipo":"Inhibición","caracter":"Simple","datos":{"ap":"Acuña","nom":"Mercedes Teodomira","tdoc":"DNI","ndoc":"1132843"},"precio":6000}],"total":21000}[/PRESUPUESTO_JSON]
+
+REGLAS PARA INTERPRETAR DATOS:
+- El apellido siempre va ÚLTIMO en el nombre completo argentino (ej: "Luis Nicolas Domingo CAROPRESE" → ap=Caroprese, nom=Luis Nicolas Domingo)
+- Los DNI se escriben sin puntos en el JSON (6.747.395 → 6747395)
+- La UF de la matrícula y la UF de la dirección deben coincidir
+- Si el cliente no pide inhibiciones explícitamente pero da datos de titulares → sugerí automáticamente una inhibición por cada titular
+
 8. Los datos del cliente y el registro del pedido se manejan automáticamente — no los menciones
 
 REGLAS PARA ESCRITURAS DE COMPRAVENTA:
@@ -586,11 +619,16 @@ Si los datos están incompletos → registrá igual y aclaralo en observaciones.
 
 DATOS BANCARIOS DEL ESTUDIO:
 Banco: Banco Ciudad
-Cuenta: Caja de Ahorro $ 000000520200348863
 CBU: 0290052010000003488639
 Alias: LAVALLE.ESTUDIO
 Titular: Mauro Raul Garone / Natalia Soledad Lavalle
-CUIT/CUIL: 20-26405610-2 / 23-29583017-4
+
+IMPORTANTE SOBRE PRECIOS:
+- Al cliente SOLO se le informa el PRECIO TOTAL del trámite
+- NUNCA mostrar ni mencionar aranceles, honorarios ni desgloses internos
+- Ejemplo correcto: "Dominio Simple: $9.000"
+- Ejemplo INCORRECTO: "Dominio Simple: $9.000 (arancel $6.000 + honorarios $3.000)"
+- El pago no condiciona el registro del pedido — NO mencionar esto al cliente
 
 Respondé siempre en español, con tono profesional pero cálido. Sé conciso. Si el cliente manda documentos, analizalos y extraé los datos relevantes para el trámite.`;
 
@@ -920,16 +958,16 @@ function mostrarDatosBancarios(total) {
   div.innerHTML = `
     <div class="msg-avatar">L</div>
     <div class="msg-bubble">
-      Si querés abonar por adelantado, podés hacerlo por transferencia:<br><br>
+      Te paso los datos de la cuenta para que puedas realizar el depósito:<br><br>
       <div class="bank-card">
-        <h4>💳 Datos para transferencia</h4>
+        <h4>💳 Datos bancarios</h4>
         <p><strong>Banco:</strong> Banco Ciudad</p>
         <p><strong>CBU:</strong> 0290052010000003488639</p>
         <p><strong>Alias:</strong> LAVALLE.ESTUDIO</p>
         <p><strong>Titular:</strong> Mauro Raul Garone / Natalia Soledad Lavalle</p>
         <p><strong>Monto:</strong> $${monto.toLocaleString('es-AR')}</p>
       </div>
-      <br>El pago <strong>no es obligatorio</strong> para procesar el pedido. Natalia se pondrá en contacto a la brevedad. 🙏
+      <br>Natalia se pondrá en contacto a la brevedad. 🙏
     </div>
   `;
   container.appendChild(div);
