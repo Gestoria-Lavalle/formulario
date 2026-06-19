@@ -1034,38 +1034,46 @@ async function registrarPedidoEnSheet() {
     console.log('Enviando al Apps Script:', JSON.stringify(payload, null, 2));
     console.log('Trámites detalle:', payload.tramites.map(t => ({tipo: t.tipo, datos: t.datos})));
 
-    // Si hay un archivo adjunto, subirlo a Drive primero
-    if (adjuntoGuardado) {
-      try {
-        const clienteNombre = (pendingCliente.ap || '') + (pendingCliente.nom ? ', ' + pendingCliente.nom : '');
-        const uploadResp = await fetch('https://lavalle-api.onrender.com/upload-pdf', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            base64: adjuntoGuardado.base64,
-            nombre: adjuntoGuardado.nombre,
-            nroPedido: 0, // se actualiza después
-            cliente: clienteNombre
-          })
-        });
-        const uploadResult = await uploadResp.json();
-        if (uploadResult.ok && uploadResult.url) {
-          // Agregar la URL del archivo al primer trámite
-          payload.tramites[0].archivoUrl = uploadResult.url;
-          payload.tramites[0].archivoNombre = adjuntoGuardado.nombre;
-          console.log('Archivo subido a Drive:', uploadResult.url);
-        }
-      } catch(e) {
-        console.warn('No se pudo subir el archivo adjunto:', e);
-      }
-      adjuntoGuardado = null;
-    }
-
     const resp = await fetch(url);
     let result;
     try { result = await resp.json(); } catch(e) { result = { ok: false, error: 'No se pudo parsear respuesta' }; }
     console.log('Respuesta Apps Script:', result);
     if (result.ok) {
+      // Si hay archivo adjunto, subirlo ahora que ya tenemos el nroPedido
+      if (adjuntoGuardado) {
+        try {
+          const clienteNombre = (pendingCliente.ap || '') + (pendingCliente.nom ? ', ' + pendingCliente.nom : '');
+          const nroPedido = result.nroPedido || 0;
+          const uploadResp = await fetch('https://lavalle-api.onrender.com/upload-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              base64: adjuntoGuardado.base64,
+              nombre: adjuntoGuardado.nombre,
+              nroPedido: nroPedido,
+              cliente: clienteNombre
+            })
+          });
+          const uploadResult = await uploadResp.json();
+          if (uploadResult.ok && uploadResult.url) {
+            console.log('Archivo subido a Drive:', uploadResult.url);
+            // Actualizar la URL en la planilla
+            const APPS_SCRIPT_URL2 = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
+            const pdfPayload = {
+              accion: 'actualizarArchivoPDF',
+              nroPedido: nroPedido,
+              nroTramite: 1,
+              archivoUrl: uploadResult.url,
+              archivoNombre: adjuntoGuardado.nombre
+            };
+            fetch(APPS_SCRIPT_URL2 + '?datos=' + encodeURIComponent(JSON.stringify(pdfPayload))).catch(() => {});
+          }
+        } catch(e) {
+          console.warn('No se pudo subir el archivo adjunto:', e);
+        }
+        adjuntoGuardado = null;
+      }
+
       addMessage('ai', `✅ <strong>Pedido #${result.nroPedido} registrado correctamente.</strong><br><br>Natalia ya puede verlo en el panel y se pondrá en contacto a la brevedad. ¡Gracias por confiar en el Estudio Lavalle!`);
       pendingPresupuesto = null;
       pendingCliente = null;
