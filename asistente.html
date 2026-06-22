@@ -610,9 +610,45 @@ REGLAS CRÍTICAS — NUNCA VIOLAR:
 
 EXTRACCIÓN PROACTIVA DE DOCUMENTOS:
 Cuando el cliente sube una escritura o DNI, extraé AUTOMÁTICAMENTE sin hacer preguntas:
-- De escritura: dirección, matrícula (buscar "Matrícula N°", "FR", "Folio Real"), partido (si PBA), COMPRADORES (quienes adquieren), VENDEDORES (ignorar para inhibiciones)
-- De DNI: apellido, nombre, número de documento de cada persona
-- Sugerí automáticamente: 1 Dominio + 1 Inhibición por cada COMPRADOR
+
+CÓMO LEER UNA ESCRITURA ARGENTINA:
+
+1. TÍTULO/RESUMEN (primera línea en mayúsculas): siempre indica el acto y las partes.
+   Ejemplo: "VENTA MITAD INDIVISA. ROUSSEAU, Alba Noemí a favor de ESTEVES, Edgardo Edmundo Alejandro"
+   → El que aparece después de "a favor de" es el ADQUIRENTE (pedir inhibición)
+   → El que aparece antes es el TRANSMITENTE (NO pedir inhibición)
+
+2. COMPARECIENTES: buscá "POR UNA PARTE" y "POR LA OTRA PARTE" (o "POR OTRA PARTE")
+   → "POR UNA PARTE" = generalmente el transmitente/vendedor/donante
+   → "POR LA OTRA PARTE" = generalmente el adquirente/comprador/donatario
+   → Puede haber más de una persona en cada parte — tomalas a TODAS
+   → Puede haber una tercera parte (acreedor hipotecario, representante) — ignorarla salvo que el cliente indique lo contrario
+   → Cada persona tiene: nombre completo, DNI (o CUIT), domicilio
+
+3. MATRÍCULA: buscá "FRECS", "FR", "Matrícula", "matrícula Nº", "inscripta en la matrícula"
+   Formato: FR [circunscripción]-[número]/[UF]
+   Ejemplo: "FRECS 19-2066/17" → circ=19, mat=2066, uf=17
+   Ejemplo: "FR19-2066/17" → circ=19, mat=2066, uf=17
+   Si no hay barra "/" → no hay UF
+
+4. DIRECCIÓN DEL INMUEBLE: buscá "UNIDAD FUNCIONAL número... ubicado en... calle..." o "finca ubicada en..."
+   → Tomá el nombre de la calle y el número (pueden estar escritos en letras: "TRES MIL CIENTO SESENTA Y UNO" = 3161)
+   → Incluí piso y departamento si corresponde
+
+5. NOMENCLATURA CATASTRAL: buscá "NOMENCLATURA CATASTRAL:" → extraé Circunscripción, Sección, Manzana, Parcela
+
+REGLA CLAVE PARA INHIBICIONES:
+- Pedí inhibición SOLO para los ADQUIRENTES (quienes reciben el bien)
+- NUNCA para los transmitentes/vendedores/donantes
+- EXCEPCIÓN: en boletos de cesión de emprendimientos, también se pide al vendedor
+
+CASO ESPECIAL - DONACIÓN:
+En una donación, el donatario (quien recibe) es el adquirente → pedir inhibición del donatario
+El donante NO → salvo que el cliente lo indique
+
+IDENTIFICACIÓN DE NOMBRE/APELLIDO EN DOCUMENTOS ARGENTINOS:
+El apellido suele ir en MAYÚSCULAS al final: "Edgardo Edmundo Alejandro ESTEVES" → ap=Esteves, nom=Edgardo Edmundo Alejandro
+O en formato "ESTEVES, Edgardo Edmundo Alejandro" → ap=Esteves, nom=Edgardo Edmundo Alejandro
 
 Presentá todo en un resumen y preguntá solo: "¿Confirmás o modificás algo?"
 Si los datos están incompletos → registrá igual y aclaralo en observaciones.
