@@ -1444,13 +1444,24 @@ function showTooltip(event, rowIndex) {
   `;
   tt.style.display = 'block';
   
-  // Posicionar cerca del cursor
-  const x = event.clientX + 15;
-  const y = event.clientY - 10;
-  const maxX = window.innerWidth - 300;
-  const maxY = window.innerHeight - 150;
-  tt.style.left = Math.min(x, maxX) + 'px';
-  tt.style.top = Math.min(y, maxY) + 'px';
+  // Posicionar cerca del cursor — arriba si está cerca del borde inferior
+  posicionarTooltip(event.clientX, event.clientY);
+}
+
+function posicionarTooltip(mouseX, mouseY) {
+  const tt = document.getElementById('tooltipPreview');
+  if (!tt || tt.style.display === 'none') return;
+  const ttH = tt.offsetHeight || 150;
+  const ttW = tt.offsetWidth || 280;
+  const margen = 15;
+  // Horizontal
+  let x = mouseX + margen;
+  if (x + ttW > window.innerWidth - 10) x = mouseX - ttW - margen;
+  // Vertical — si no cabe abajo, mostrar arriba
+  let y = mouseY + margen;
+  if (y + ttH > window.innerHeight - 10) y = mouseY - ttH - margen;
+  tt.style.left = Math.max(5, x) + 'px';
+  tt.style.top = Math.max(5, y) + 'px';
 }
 
 function hideTooltip() {
@@ -1461,12 +1472,7 @@ function hideTooltip() {
 document.addEventListener('mousemove', function(e) {
   const tt = document.getElementById('tooltipPreview');
   if (tt && tt.style.display === 'block') {
-    const x = e.clientX + 15;
-    const y = e.clientY - 10;
-    const maxX = window.innerWidth - 300;
-    const maxY = window.innerHeight - 150;
-    tt.style.left = Math.min(x, maxX) + 'px';
-    tt.style.top = Math.min(y, maxY) + 'px';
+    posicionarTooltip(e.clientX, e.clientY);
   }
 });
 
