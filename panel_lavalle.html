@@ -380,40 +380,6 @@ tbody td {
 }
 
 .btn-action:hover { opacity: 0.8; }
-
-/* TOOLTIP DE PREVISUALIZACIÓN */
-.tooltip-preview {
-  position: fixed;
-  background: #1a2744;
-  border: 1px solid rgba(201,168,76,0.3);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 12.5px;
-  color: #e8edf2;
-  max-width: 280px;
-  z-index: 9999;
-  pointer-events: none;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  line-height: 1.7;
-  display: none;
-}
-.tooltip-preview .tt-title {
-  font-weight: 600;
-  color: #c9a84c;
-  font-size: 13px;
-  margin-bottom: 5px;
-  border-bottom: 1px solid rgba(201,168,76,0.2);
-  padding-bottom: 4px;
-}
-.tooltip-preview .tt-row {
-  display: flex;
-  gap: 6px;
-}
-.tooltip-preview .tt-label {
-  color: #8899aa;
-  min-width: 70px;
-  font-size: 11px;
-}
 .btn-edit { background: rgba(52,152,219,0.2); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
 .btn-pay { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
 
@@ -586,6 +552,7 @@ tbody td {
     <div class="header-actions">
       <span id="last-update" style="font-size:12px;color:var(--text-dim)"></span>
       <button class="btn-refresh" onclick="loadData()">↻ Actualizar</button>
+      <a href="/reportes.html" style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:#c9a84c;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none">📊 Reportes</a>
       <button class="btn-logout" onclick="logout()">Salir</button>
     </div>
   </header>
@@ -1180,7 +1147,7 @@ function renderTable(){
     </thead>
     <tbody>
       ${filteredData.map(r => `
-        <tr onmouseenter="showTooltip(event, ${r.rowIndex})" onmouseleave="hideTooltip()">
+        <tr>
           <td style="font-family:'JetBrains Mono',monospace;color:var(--gold)">#${r.nroPedido}</td>
           <td style="color:var(--text-dim)">${r.fecha}</td>
           <td style="font-weight:500;color:var(--white)">${r.cliente}</td>
@@ -1405,77 +1372,6 @@ document.addEventListener('mouseout', function(e){
   }
 });
 
-function showTooltip(event, rowIndex) {
-  const r = allData.find(x => x.rowIndex === rowIndex);
-  if (!r) return;
-
-  // Extraer info clave de datos del trámite
-  const datos = r.datos || '';
-  let info = '';
-  
-  // Dirección
-  const dirMatch = datos.match(/Dir:\s*([^|]+)/i);
-  if (dirMatch) info += `<div class="tt-row"><span class="tt-label">Dirección</span><span>${dirMatch[1].trim()}</span></div>`;
-  
-  // Matrícula FR
-  const frMatch = datos.match(/FR:\s*([^|]+)/i);
-  if (frMatch) info += `<div class="tt-row"><span class="tt-label">Matrícula</span><span>${frMatch[1].trim()}</span></div>`;
-  
-  // Persona (inhibición/índice)
-  const apMatch = datos.match(/^([^|]+),\s*([^|]+)\s*\|/);
-  if (!dirMatch && !frMatch && apMatch) {
-    info += `<div class="tt-row"><span class="tt-label">Persona</span><span>${apMatch[1].trim()}, ${apMatch[2].trim()}</span></div>`;
-  } else if (!dirMatch && !frMatch && datos) {
-    info += `<div class="tt-row"><span class="tt-label">Datos</span><span>${datos.substring(0, 60)}${datos.length > 60 ? '...' : ''}</span></div>`;
-  }
-  
-  // Titulares
-  const titMatch = datos.match(/Titulares:\s*([^|]+)/i);
-  if (titMatch) info += `<div class="tt-row"><span class="tt-label">Titulares</span><span>${titMatch[1].trim().substring(0, 50)}${titMatch[1].length > 50 ? '...' : ''}</span></div>`;
-
-  // DNI
-  const dniMatch = datos.match(/(DNI|LC|LE|Pasaporte)\s*(\d+)/i);
-  if (dniMatch) info += `<div class="tt-row"><span class="tt-label">Doc.</span><span>${dniMatch[1]} ${dniMatch[2]}</span></div>`;
-
-  const tt = document.getElementById('tooltipPreview');
-  tt.innerHTML = `
-    <div class="tt-title">${r.organismo} — ${r.tipo} ${r.caracter}</div>
-    ${info || '<div style="color:#8899aa;font-size:12px">Sin datos adicionales</div>'}
-  `;
-  tt.style.display = 'block';
-  
-  // Posicionar cerca del cursor — arriba si está cerca del borde inferior
-  posicionarTooltip(event.clientX, event.clientY);
-}
-
-function posicionarTooltip(mouseX, mouseY) {
-  const tt = document.getElementById('tooltipPreview');
-  if (!tt || tt.style.display === 'none') return;
-  const ttH = tt.offsetHeight || 150;
-  const ttW = tt.offsetWidth || 280;
-  const margen = 15;
-  // Horizontal
-  let x = mouseX + margen;
-  if (x + ttW > window.innerWidth - 10) x = mouseX - ttW - margen;
-  // Vertical — si no cabe abajo, mostrar arriba
-  let y = mouseY + margen;
-  if (y + ttH > window.innerHeight - 10) y = mouseY - ttH - margen;
-  tt.style.left = Math.max(5, x) + 'px';
-  tt.style.top = Math.max(5, y) + 'px';
-}
-
-function hideTooltip() {
-  document.getElementById('tooltipPreview').style.display = 'none';
-}
-
-// Mover tooltip con el mouse
-document.addEventListener('mousemove', function(e) {
-  const tt = document.getElementById('tooltipPreview');
-  if (tt && tt.style.display === 'block') {
-    posicionarTooltip(e.clientX, e.clientY);
-  }
-});
-
 function showToast(msg, type){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1581,8 +1477,6 @@ function generarReporte(){
     <button onclick="window.close()" style="padding:10px 24px;background:#f0f0f0;color:#333;border:none;border-radius:8px;font-size:14px;cursor:pointer">✕ Cerrar</button>
   </div>
   <div class="footer">Estudio Lavalle & Asoc. · lavalle.garone@gmail.com · gestorialavalle.com.ar</div>
-<div class="tooltip-preview" id="tooltipPreview"></div>
-
 </body>
 </html>`;
 
@@ -1629,7 +1523,5 @@ async function eliminarTramite(rowIndex, cliente, tipo, nroPedido, nroTramite){
   }
 }
 </script>
-<div class="tooltip-preview" id="tooltipPreview"></div>
-
 </body>
 </html>
