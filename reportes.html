@@ -80,6 +80,8 @@ header{background:var(--navy);padding:14px 24px;display:flex;align-items:center;
 .mov-neg{color:var(--red)}
 
 .loading{text-align:center;padding:40px;color:var(--text2);font-size:14px}
+.sug-item{padding:8px 12px;cursor:pointer;font-size:13px;color:var(--text)}
+.sug-item:hover{background:rgba(201,168,76,0.1);color:var(--gold)}
 .badge-estado{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
 .badge-pendiente{background:rgba(245,158,11,0.2);color:#f59e0b}
 .badge-proceso{background:rgba(59,130,246,0.2);color:#60a5fa}
@@ -133,9 +135,11 @@ header{background:var(--navy);padding:14px 24px;display:flex;align-items:center;
         <option>Entregado</option>
       </select>
     </div>
-    <div class="filtro-group">
+    <div class="filtro-group" style="position:relative">
       <label>Cliente</label>
-      <input type="text" id="f-cliente" placeholder="Buscar cliente...">
+      <input type="text" id="f-cliente" placeholder="Buscar cliente..." autocomplete="off"
+        oninput="filtrarSugerencias()" onfocus="filtrarSugerencias()" onblur="setTimeout(()=>hideSugerencias(),200)">
+      <div id="sugerencias" style="display:none;position:absolute;top:100%;left:0;right:0;background:#162540;border:1px solid rgba(201,168,76,0.3);border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;margin-top:2px"></div>
     </div>
     <button class="btn-filtrar" onclick="aplicarFiltros()">🔍 Filtrar</button>
     <button class="btn-filtrar" style="background:rgba(255,255,255,0.1);color:#fff" onclick="limpiarFiltros()">✕ Limpiar</button>
@@ -187,6 +191,29 @@ document.getElementById('f-desde').value = hace30.toISOString().slice(0,10);
 document.getElementById('f-hasta').value = hoy.toISOString().slice(0,10);
 
 window.onload = cargarDatos;
+
+function filtrarSugerencias() {
+  const val = document.getElementById('f-cliente').value.toLowerCase();
+  const div = document.getElementById('sugerencias');
+  // Obtener lista única de clientes
+  const clientes = [...new Set(allTramites.map(t => t.cliente).filter(Boolean))].sort();
+  const filtrados = val ? clientes.filter(c => c.toLowerCase().includes(val)) : clientes;
+  if (filtrados.length === 0) { div.style.display = 'none'; return; }
+  div.innerHTML = filtrados.slice(0, 15).map(c =>
+    `<div class="sug-item" onmousedown="seleccionarCliente('${c.replace(/'/g, '\u2019')}')">${c}</div>`
+  ).join('');
+  div.style.display = 'block';
+}
+
+function seleccionarCliente(nombre) {
+  document.getElementById('f-cliente').value = nombre;
+  hideSugerencias();
+  aplicarFiltros();
+}
+
+function hideSugerencias() {
+  document.getElementById('sugerencias').style.display = 'none';
+}
 
 async function cargarDatos() {
   try {
