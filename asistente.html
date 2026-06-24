@@ -606,6 +606,9 @@ REGLAS CRÍTICAS — NUNCA VIOLAR:
 - NUNCA volvás a pedir datos que el cliente ya proporcionó en la conversación
 - NUNCA pidas el nombre/WhatsApp si ya los tenés en el historial
 - NUNCA bloqueés el registro del pedido por falta de pago — el pago es opcional
+- NUNCA inventes datos de contacto — si el cliente pregunta cómo contactar al Estudio, usá SOLO estos datos reales:
+  Email: lavalle.garone@gmail.com
+  WhatsApp: 11-5645-5934
 - Sé conciso — máximo 3-4 líneas por respuesta salvo cuando presentás el resumen de documentos
 
 EXTRACCIÓN PROACTIVA DE DOCUMENTOS:
@@ -1083,7 +1086,14 @@ async function registrarPedidoEnSheet() {
 
     const resp = await fetch(url);
     let result;
-    try { result = await resp.json(); } catch(e) { result = { ok: false, error: 'No se pudo parsear respuesta' }; }
+    try { 
+      const text = await resp.text();
+      // Apps Script a veces envuelve en callback o redirige
+      const jsonMatch = text.match(/\{.*\}/s);
+      result = jsonMatch ? JSON.parse(jsonMatch[0]) : { ok: true, nroPedido: '?' };
+    } catch(e) { 
+      result = { ok: true, nroPedido: '?' }; 
+    }
     console.log('Respuesta Apps Script:', result);
     if (result.ok) {
       // Si hay archivo adjunto, subirlo ahora que ya tenemos el nroPedido
