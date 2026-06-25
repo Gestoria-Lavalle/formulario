@@ -592,8 +592,8 @@ tbody td {
   </header>
 
   <div class="content">
-    <!-- STATS -->
-    <div class="stats-grid" id="stats-grid">
+    <!-- STATS — ocultos, info ya disponible en el resumen de filtrado -->
+    <div class="stats-grid" id="stats-grid" style="display:none">
       <div class="stat-card"><div class="stat-label">Total Trámites</div><div class="stat-value" id="stat-total">—</div></div>
       <div class="stat-card gold"><div class="stat-label">Pendientes</div><div class="stat-value" id="stat-pendiente">—</div></div>
       <div class="stat-card blue"><div class="stat-label">En Proceso</div><div class="stat-value" id="stat-proceso">—</div></div>
@@ -675,57 +675,57 @@ tbody td {
     </div>
 
     <!-- RESUMEN FILTRADO -->
-    <div id="resumen-filtrado" style="margin-bottom:20px">
+    <div id="resumen-filtrado" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">📊 Resumen del filtrado actual</div>
         <button id="btn-reporte" onclick="generarReporte()" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;color:var(--navy);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer">
           🖨️ Generar reporte
         </button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;margin-bottom:10px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total</div>
-          <div id="r-cantidad" style="font-size:22px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-cantidad" style="font-size:16px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(243,156,18,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(243,156,18,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pendientes</div>
-          <div id="r-pendiente" style="font-size:22px;font-weight:700;color:#f39c12;font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-pendiente" style="font-size:16px;font-weight:700;color:#f39c12;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(52,152,219,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(52,152,219,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">En Proceso</div>
-          <div id="r-proceso" style="font-size:22px;font-weight:700;color:#3498db;font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-proceso" style="font-size:16px;font-weight:700;color:#3498db;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Listos</div>
-          <div id="r-listo" style="font-size:22px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-listo" style="font-size:16px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Entregados</div>
-          <div id="r-entregado" style="font-size:22px;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-entregado" style="font-size:16px;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✓ Pagados</div>
-          <div id="r-pagado" style="font-size:22px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-pagado" style="font-size:16px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✗ No pagados</div>
-          <div id="r-nopagado" style="font-size:22px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">0</div>
+          <div id="r-nopagado" style="font-size:16px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💸 Total Aranceles</div>
-          <div id="r-aranceles" style="font-size:18px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
+          <div id="r-aranceles" style="font-size:15px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Hon. Cobrado</div>
-          <div id="r-cobrado" style="font-size:18px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
+          <div id="r-cobrado" style="font-size:15px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ Hon. A cobrar</div>
-          <div id="r-acobrar" style="font-size:18px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
+          <div id="r-acobrar" style="font-size:15px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;text-align:center">
           <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Hon.</div>
-          <div id="r-total-hon" style="font-size:18px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">$0</div>
+          <div id="r-total-hon" style="font-size:15px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">$0</div>
         </div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-dim)" id="r-descripcion"></div>
