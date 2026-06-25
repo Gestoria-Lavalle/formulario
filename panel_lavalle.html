@@ -605,11 +605,18 @@ tbody td {
     <!-- FILTERS -->
     <div class="filters-bar" style="flex-direction:column;align-items:stretch;gap:14px">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
-        <div class="filter-group">
+        <div class="filter-group" style="position:relative">
           <span class="filter-label">Cliente</span>
-          <select class="filter-select" id="f-cliente" onchange="applyFilters()">
-            <option value="">Todos</option>
-          </select>
+          <div id="cliente-btn" onclick="toggleClienteDropdown()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px;color:var(--text);min-width:160px;display:flex;justify-content:space-between;align-items:center;gap:8px;user-select:none">
+            <span id="cliente-label">Todos</span><span style="color:var(--text-dim)">▾</span>
+          </div>
+          <div id="cliente-dropdown" style="display:none;position:absolute;top:100%;left:0;background:var(--card);border:1px solid var(--border);border-radius:8px;z-index:200;min-width:220px;max-height:260px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,0.4);margin-top:4px">
+            <div style="padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px">
+              <input type="text" id="cliente-search" placeholder="Buscar..." oninput="filtrarOpcionesCliente()" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:12px;outline:none">
+              <button onclick="limpiarClientes()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px">✕ Limpiar</button>
+            </div>
+            <div id="cliente-opciones"></div>
+          </div>
         </div>
         <div class="filter-group">
           <span class="filter-label">Organismo</span>
@@ -676,55 +683,55 @@ tbody td {
 
     <!-- RESUMEN FILTRADO -->
     <div id="resumen-filtrado" style="margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">📊 Resumen del filtrado actual</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+        <div style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px">📊 Resumen del filtrado actual</div>
         <button id="btn-reporte" onclick="generarReporte()" style="display:none;align-items:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;color:var(--navy);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer">
           🖨️ Generar reporte
         </button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;margin-bottom:10px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:5px;margin-bottom:8px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Total</div>
           <div id="r-cantidad" style="font-size:16px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(243,156,18,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pendientes</div>
+        <div style="background:var(--card);border:1px solid rgba(243,156,18,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Pendientes</div>
           <div id="r-pendiente" style="font-size:16px;font-weight:700;color:#f39c12;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(52,152,219,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">En Proceso</div>
+        <div style="background:var(--card);border:1px solid rgba(52,152,219,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">En Proceso</div>
           <div id="r-proceso" style="font-size:16px;font-weight:700;color:#3498db;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Listos</div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Listos</div>
           <div id="r-listo" style="font-size:16px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Entregados</div>
+        <div style="background:var(--card);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Entregados</div>
           <div id="r-entregado" style="font-size:16px;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✓ Pagados</div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">✓ Pagados</div>
           <div id="r-pagado" style="font-size:16px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">✗ No pagados</div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">✗ No pagados</div>
           <div id="r-nopagado" style="font-size:16px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💸 Total Aranceles</div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">💸 Total Aranceles</div>
           <div id="r-aranceles" style="font-size:15px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💰 Hon. Cobrado</div>
+        <div style="background:var(--card);border:1px solid rgba(46,204,113,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">💰 Hon. Cobrado</div>
           <div id="r-cobrado" style="font-size:15px;font-weight:700;color:#2ecc71;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
-        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⏳ Hon. A cobrar</div>
+        <div style="background:var(--card);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">⏳ Hon. A cobrar</div>
           <div id="r-acobrar" style="font-size:15px;font-weight:700;color:#e74c3c;font-family:'JetBrains Mono',monospace">$0</div>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;text-align:center">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Total Hon.</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:6px 8px;text-align:center">
+          <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Total Hon.</div>
           <div id="r-total-hon" style="font-size:15px;font-weight:700;color:var(--white);font-family:'JetBrains Mono',monospace">$0</div>
         </div>
       </div>
@@ -1015,16 +1022,77 @@ function updateStats(){
 }
 
 function updateClientFilter(){
-  const sel = document.getElementById('f-cliente');
-  const current = sel.value;
   const clientes = [...new Set(allData.map(r => r.cliente))].filter(Boolean).sort();
-  sel.innerHTML = '<option value="">Todos</option>' + clientes.map(c => `<option>${c}</option>`).join('');
-  sel.value = current;
+  renderClienteOpciones(clientes);
 }
 
 // FILTERS
+let clientesSeleccionados = new Set();
+
+function renderClienteOpciones(lista) {
+  const search = document.getElementById('cliente-search')?.value.toLowerCase() || '';
+  const filtrados = search ? lista.filter(c => c.toLowerCase().includes(search)) : lista;
+  const div = document.getElementById('cliente-opciones');
+  if (!div) return;
+  div.innerHTML = filtrados.map(c => `
+    <label style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:12.5px;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04)" 
+      onmouseover="this.style.background='rgba(201,168,76,0.08)'" onmouseout="this.style.background=''">
+      <input type="checkbox" value="${c.replace(/"/g,'&quot;')}" ${clientesSeleccionados.has(c)?'checked':''} 
+        onchange="toggleCliente('${c.replace(/'/g,'\u2019')}')" style="accent-color:var(--gold);width:14px;height:14px">
+      ${c}
+    </label>
+  `).join('');
+}
+
+function toggleCliente(nombre) {
+  if (clientesSeleccionados.has(nombre)) clientesSeleccionados.delete(nombre);
+  else clientesSeleccionados.add(nombre);
+  actualizarLabelCliente();
+  applyFilters();
+}
+
+function limpiarClientes() {
+  clientesSeleccionados = new Set();
+  actualizarLabelCliente();
+  renderClienteOpciones([...new Set(allData.map(r=>r.cliente).filter(Boolean))].sort());
+  applyFilters();
+}
+
+function actualizarLabelCliente() {
+  const label = document.getElementById('cliente-label');
+  if (!label) return;
+  if (clientesSeleccionados.size === 0) label.textContent = 'Todos';
+  else if (clientesSeleccionados.size === 1) label.textContent = [...clientesSeleccionados][0].split(',')[0];
+  else label.textContent = clientesSeleccionados.size + ' seleccionados';
+}
+
+function getClientesSeleccionados() {
+  return clientesSeleccionados.size > 0 ? [...clientesSeleccionados] : null;
+}
+
+function filtrarOpcionesCliente() {
+  const lista = [...new Set(allData.map(r=>r.cliente).filter(Boolean))].sort();
+  renderClienteOpciones(lista);
+}
+
+function toggleClienteDropdown() {
+  const dd = document.getElementById('cliente-dropdown');
+  if (!dd) return;
+  const visible = dd.style.display !== 'none';
+  dd.style.display = visible ? 'none' : 'block';
+  if (!visible) document.getElementById('cliente-search')?.focus();
+}
+
+document.addEventListener('click', function(e) {
+  const btn = document.getElementById('cliente-btn');
+  const dd = document.getElementById('cliente-dropdown');
+  if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
+
 function applyFilters(){
-  const fc = document.getElementById('f-cliente').value;
+  const fc = getClientesSeleccionados();
   const fo = document.getElementById('f-org').value;
   const ft = document.getElementById('f-tipo').value;
   const fe = document.getElementById('f-estado').value;
@@ -1034,7 +1102,7 @@ function applyFilters(){
   const fh = document.getElementById('f-hasta').value;
 
   filteredData = allData.filter(r => {
-    if(fc && r.cliente !== fc) return false;
+    if(fc && !fc.includes(r.cliente)) return false;
     if(fo && r.organismo !== fo) return false;
     if(ft && r.tipo !== ft) return false;
     if(fe && r.estado !== fe) return false;
@@ -1078,7 +1146,7 @@ function setRango(dias){
 }
 
 function clearFilters(){
-  document.getElementById('f-cliente').value = '';
+  clientesSeleccionados = new Set(); actualizarLabelCliente(); renderClienteOpciones([...new Set(allData.map(r=>r.cliente).filter(Boolean))].sort());
   document.getElementById('f-org').value = '';
   document.getElementById('f-tipo').value = '';
   document.getElementById('f-estado').value = '';
@@ -1126,7 +1194,7 @@ function updateResumenFiltrado(){
 
   // Descripcion del filtro activo
   const partes = [];
-  const fc = document.getElementById('f-cliente').value;
+  const fc = getClientesSeleccionados();
   const fo = document.getElementById('f-org').value;
   const ft = document.getElementById('f-tipo').value;
   const fe = document.getElementById('f-estado').value;
