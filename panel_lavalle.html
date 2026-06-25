@@ -641,6 +641,15 @@ tbody td {
           </select>
         </div>
         <div class="filter-group">
+          <span class="filter-label">Carácter</span>
+          <select class="filter-select" id="f-caracter" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Simple</option>
+            <option>Urgente</option>
+            <option>Urgente Express</option>
+          </select>
+        </div>
+        <div class="filter-group">
           <span class="filter-label">Estado</span>
           <select class="filter-select" id="f-estado" onchange="applyFilters()">
             <option value="">Todos</option>
@@ -1095,6 +1104,7 @@ function applyFilters(){
   const fc = getClientesSeleccionados();
   const fo = document.getElementById('f-org').value;
   const ft = document.getElementById('f-tipo').value;
+  const fcar = document.getElementById('f-caracter').value;
   const fe = document.getElementById('f-estado').value;
   const fp = document.getElementById('f-pago').value;
   const fb = document.getElementById('f-buscar').value.toLowerCase();
@@ -1105,6 +1115,7 @@ function applyFilters(){
     if(fc && !fc.includes(r.cliente)) return false;
     if(fo && r.organismo !== fo) return false;
     if(ft && r.tipo !== ft) return false;
+    if(fcar && r.caracter !== fcar) return false;
     if(fe && r.estado !== fe) return false;
     if(fp && r.pago !== fp) return false;
     if(fb && !`${r.cliente} ${r.tipo} ${r.datos} ${r.organismo}`.toLowerCase().includes(fb)) return false;
@@ -1149,6 +1160,7 @@ function clearFilters(){
   clientesSeleccionados = new Set(); actualizarLabelCliente(); renderClienteOpciones([...new Set(allData.map(r=>r.cliente).filter(Boolean))].sort());
   document.getElementById('f-org').value = '';
   document.getElementById('f-tipo').value = '';
+  document.getElementById('f-caracter').value = '';
   document.getElementById('f-estado').value = '';
   document.getElementById('f-pago').value = '';
   document.getElementById('f-buscar').value = '';
@@ -1197,6 +1209,7 @@ function updateResumenFiltrado(){
   const fc = getClientesSeleccionados();
   const fo = document.getElementById('f-org').value;
   const ft = document.getElementById('f-tipo').value;
+  const fcar = document.getElementById('f-caracter').value;
   const fe = document.getElementById('f-estado').value;
   const fp = document.getElementById('f-pago').value;
   const fd = document.getElementById('f-desde').value;
