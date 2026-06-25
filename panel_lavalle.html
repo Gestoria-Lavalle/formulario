@@ -1560,7 +1560,8 @@ document.getElementById('pin-input').addEventListener('keydown', function(e){
 });
 
 function generarReporte(){
-  const fc = document.getElementById('f-cliente').value || 'Todos los clientes';
+  const fcArr = getClientesSeleccionados();
+  const fc = fcArr ? fcArr.join(', ') : 'Todos los clientes';
   const fd = document.getElementById('f-desde').value;
   const fh = document.getElementById('f-hasta').value;
   const fechaDesde = fd ? fd.split('-').reverse().join('/') : '—';
