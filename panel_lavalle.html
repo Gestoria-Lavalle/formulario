@@ -950,7 +950,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj1
 async function cargarApiKey() {
   try {
     const cfg = await fetch('/api/get-config').then(r=>r.json());
-    API_KEY = cfg.googleApiKey || cfg.GOOGLE_API_KEY || '';
+    API_KEY = cfg.apiKey || cfg.googleApiKey || cfg.GOOGLE_API_KEY || '';
   } catch(e) { console.warn('No se pudo cargar API key:', e); }
 }
 
