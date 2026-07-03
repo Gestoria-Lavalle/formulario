@@ -943,16 +943,8 @@ function fmtMoney(v){
 }
 
 const SHEET_ID = '1NgHGxB50WVhWIbSMMV40Oh6mnWOy7Ygoymqn9QIrSyE';
-let API_KEY = '';
+let API_KEY = 'AIzaSyC1_FRVWDxAi39uYOWWwU8amK3i933-7zU';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzma66TR1P6WHj14iRQ9xvZc5xLKR86GGP9mc6uRNV08dxFi11Dz7n5lfbqUaJEqHYTVw/exec';
-
-// Cargar API key desde Netlify Function
-async function cargarApiKey() {
-  try {
-    const cfg = await fetch('/api/get-config').then(r=>r.json());
-    API_KEY = cfg.apiKey || cfg.googleApiKey || cfg.GOOGLE_API_KEY || '';
-  } catch(e) { console.warn('No se pudo cargar API key:', e); }
-}
 
 let allData = [];
 let filteredData = [];
@@ -979,7 +971,6 @@ function logout(){
 
 // LOAD DATA
 async function loadData(){
-  if (!API_KEY) await cargarApiKey();
   document.getElementById('table-content').innerHTML = '<div class="loading"><div class="spinner"></div>Cargando datos...</div>';
   try {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/TRAMITES!A2:Q500?key=${API_KEY}`;
