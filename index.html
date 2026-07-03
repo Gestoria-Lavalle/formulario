@@ -302,7 +302,7 @@ const PRECIOS = {
     'Copia Asiento Registral':   {Simple:[20400,29000],Urgente:[52200,71500],'Urgente Express':[114300,135000]},
     'Índice de Titularidad':     {Simple:[20400,29000],Urgente:[52200,65000],'Urgente Express':[114300,130000]},
   },
-  'Catastro GCBA':{'Planos':{Simple:[0,7000]},'Cert. Info. Registral':{Simple:[0,0]}},
+  'Catastro GCBA':{'Planos':{Simple:[0,7000],Urgente:[25000,40000]},'Pre-Factibilidad':{Simple:[0,50000]},'Cert. Info. Registral':{Simple:[0,0]}},
   'ARBA':{'Planos PH':{Simple:[3658,10000]}},
   'Protocolos Notariales':{'Reglamento de Copropiedad':{Simple:[35000,80000]}},
 };
@@ -473,6 +473,7 @@ function buildStep5(){
     else if(t==='Índice de Titularidad')fIdxPBA(c);
   }
   if(o==='Catastro GCBA'&&t==='Planos')fPlanosGCBA(c);
+  if(o==='Catastro GCBA'&&t==='Pre-Factibilidad')fPreFactibilidadCABA(c);
   if(o==='ARBA'&&t==='Planos PH')fPlanosARBA(c);
   if(o==='Protocolos Notariales'&&t==='Reglamento de Copropiedad')fReglamentoCopropiedad(c);
 }
@@ -906,6 +907,20 @@ function fIdxPBA(c){
 }
 
 // CATASTRO GCBA
+function fPreFactibilidadCABA(c){
+  c.innerHTML=`
+    <div class="field-group">
+      <label class="field-label">Nombre de calle o avenida *</label>
+      <input class="field-input" id="pf-calle" placeholder="Ej: Corrientes, Av. Santa Fe, etc." oninput="autoSave()">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Numeración *</label>
+      <input class="field-input" id="pf-numero" placeholder="Ej: 1234" type="number" oninput="autoSave()">
+    </div>
+    <div class="alert info">ℹ️ El informe de Pre-Factibilidad incluye la normativa urbanística vigente para la dirección indicada.</div>
+  `;
+}
+
 function fPlanosGCBA(c){
   c.innerHTML=`
   <div class="section-label">Datos — Sistema TAD GCBA</div>
@@ -1277,6 +1292,10 @@ function generarResumen(){
         L.push(`  Persona : ${tr.persona}`);
         L.push(`  Búsqueda: General (sin distinción de partido)`);
       }
+    }
+    if(o==='Catastro GCBA'&&t==='Pre-Factibilidad'){
+      const d=datos;
+      html+=`<div class="resumen-dato"><span class="resumen-label">Dirección</span><span>${d.calle} ${d.numero} CABA</span></div>`;
     }
     if(o==='Catastro GCBA'&&t==='Planos'){
       L.push(`  Plano   : ${tr.nro}-${tr.anio}`);
