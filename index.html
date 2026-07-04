@@ -414,7 +414,7 @@ function selOrgPrefactibilidad(el){
   el.classList.add('selected');
   S.org='Estudio Lavalle'; S.tipo='Pre-Factibilidad'; S.caracter='Simple';
   setTimeout(function(){
-    goStep(4);
+    goStep(5);
     var c=document.getElementById('form-campos');
     if(c) fPreFactibilidadCABA(c);
   },200);
@@ -927,15 +927,18 @@ function fIdxPBA(c){
 // CATASTRO GCBA
 function fPreFactibilidadCABA(c){
   c.innerHTML=`
-    <div class="field-group">
-      <label class="field-label">Nombre de calle o avenida *</label>
-      <input class="field-input" id="pf-calle" placeholder="Ej: Corrientes, Av. Santa Fe, etc." oninput="autoSave()">
+    <div class="section-label">Datos de la dirección</div>
+    <div class="form-grid cols-2" style="margin-bottom:12px">
+      <div class="field-group">
+        <label class="field-label">Calle o Avenida *</label>
+        <input class="field-input" id="pf-calle" placeholder="Ej: Corrientes, Av. Santa Fe" oninput="autoSave()">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Numeración *</label>
+        <input class="field-input" id="pf-numero" placeholder="Ej: 1234" type="number" oninput="autoSave()">
+      </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">Numeración *</label>
-      <input class="field-input" id="pf-numero" placeholder="Ej: 1234" type="number" oninput="autoSave()">
-    </div>
-    <div class="alert info">ℹ️ El informe de Pre-Factibilidad incluye la normativa urbanística vigente para la dirección indicada.</div>
+    <div class="alert info">ℹ️ El informe incluye la normativa urbanística vigente (CUR 2025) para la dirección indicada.</div>
   `;
 }
 
