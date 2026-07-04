@@ -405,21 +405,19 @@ function confirmarCliente(){
 // ============================================================
 // STEP 2
 // ============================================================
-function selOrgPrefactibilidad(el) {
-  if(S.tramites.length > 0 && S.org !== 'Estudio Lavalle') {
+function selOrgPrefactibilidad(el){
+  if(S.tramites.length>0&&S.org!=='Estudio Lavalle'){
     alert(`Este pedido ya tiene trámites en ${S.org}. Para cambiar de organismo, confirmá el pedido actual e iniciá uno nuevo.`);
     return;
   }
   document.querySelectorAll('#step2 .option-card').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
-  S.org = 'Estudio Lavalle';
-  S.tipo = 'Pre-Factibilidad';
-  S.caracter = 'Simple';
-  setTimeout(() => {
+  S.org='Estudio Lavalle'; S.tipo='Pre-Factibilidad'; S.caracter='Simple';
+  setTimeout(function(){
     goStep(4);
-    const c = document.getElementById('form-campos');
+    var c=document.getElementById('form-campos');
     if(c) fPreFactibilidadCABA(c);
-  }, 200);
+  },200);
 }
 
 function selOrg(org,el){
