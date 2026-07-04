@@ -412,16 +412,8 @@ function selOrgPrefactibilidad(el){
   }
   document.querySelectorAll('#step2 .option-card').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
-  S.org='Estudio Lavalle'; S.tipo='Pre-Factibilidad'; S.caracter='Simple';
-  // Marcar steps 3 y 4 como completados en el stepper
-  document.querySelectorAll('.step-item').forEach(function(s,i){
-    if(i===2||i===3){ s.classList.add('completed'); s.classList.remove('active'); }
-  });
-  setTimeout(function(){
-    goStep(5);
-    var c=document.getElementById('form-campos');
-    if(c) fPreFactibilidadCABA(c);
-  },200);
+  S.org='Estudio Lavalle'; S.tipo=''; S.caracter='';
+  document.getElementById('btn2').disabled=false;
 }
 
 function selOrg(org,el){
@@ -440,7 +432,7 @@ function selOrg(org,el){
 // STEP 3
 // ============================================================
 function buildStep3(){
-  const subs={'RPI-CABA':'Trámites ante el Registro de la Propiedad Inmueble — Capital Federal.','RPI-PBA':'Trámites ante el Registro de la Propiedad Inmueble — Provincia de Buenos Aires.','Catastro GCBA':'Trámites ante Catastro del Gobierno de la Ciudad.','ARBA':'Trámites ante la Agencia de Recaudación de la Provincia de Buenos Aires.','Protocolos Notariales':'Trámites ante el Archivo de Protocolos Notariales — CABA / Provincia.'};
+  const subs={'RPI-CABA':'Trámites ante el Registro de la Propiedad Inmueble — Capital Federal.','RPI-PBA':'Trámites ante el Registro de la Propiedad Inmueble — Provincia de Buenos Aires.','Catastro GCBA':'Trámites ante Catastro del Gobierno de la Ciudad.','ARBA':'Trámites ante la Agencia de Recaudación de la Provincia de Buenos Aires.','Protocolos Notariales':'Trámites ante el Archivo de Protocolos Notariales — CABA / Provincia.','Estudio Lavalle':'Servicios propios del Estudio Lavalle & Asoc.'};
   document.getElementById('sub3').textContent=subs[S.org]||'';
   const tipos=Object.keys(PRECIOS[S.org]);
   const c=document.getElementById('pills3');c.innerHTML='';
@@ -931,18 +923,15 @@ function fIdxPBA(c){
 // CATASTRO GCBA
 function fPreFactibilidadCABA(c){
   c.innerHTML=`
-    <div class="section-label">Datos de la dirección</div>
-    <div class="form-grid cols-2" style="margin-bottom:12px">
-      <div class="field-group">
-        <label class="field-label">Calle o Avenida *</label>
-        <input class="field-input" id="pf-calle" placeholder="Ej: Corrientes, Av. Santa Fe" oninput="autoSave()">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Numeración *</label>
-        <input class="field-input" id="pf-numero" placeholder="Ej: 1234" type="number" oninput="autoSave()">
-      </div>
-    </div>
-    <div class="alert info">ℹ️ El informe incluye la normativa urbanística vigente (CUR 2025) para la dirección indicada.</div>
+  <div class="section-label">Datos de la dirección — Pre-Factibilidad CABA</div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Calle o Avenida</label><input type="text" id="pf-calle" placeholder="Ej: Corrientes, Av. Santa Fe" oninput="autoSave()"></div>
+    <div class="field required"><label>Numeración</label><input type="text" id="pf-numero" placeholder="Ej: 1234" oninput="autoSave()"></div>
+  </div>
+  <div class="form-grid cols-2" style="margin-bottom:12px">
+    <div class="field required"><label>Chapa municipal</label><input type="text" id="pf-chapa" placeholder="Ej: 1234" oninput="autoSave()"></div>
+  </div>
+  <div class="alert info">ℹ️ El informe incluye la normativa urbanística vigente (CUR 2025) para la dirección indicada.</div>
   `;
 }
 
@@ -1071,6 +1060,11 @@ function collectDatos(){
       d.archivoNombre=S.archivos['gc_pdf'];
       if(S.archivosBase64&&S.archivosBase64['gc_pdf']) d.archivoBase64=S.archivosBase64['gc_pdf'].base64;
     }
+  }
+  if((o==='Estudio Lavalle'||o==='Catastro GCBA')&&t==='Pre-Factibilidad'){
+    d.calle=gv('pf-calle');d.numero=gv('pf-numero');d.chapa=gv('pf-chapa');
+    d.dir=d.calle+' '+d.numero+' CABA';
+    if(!d.calle||!d.numero||!d.chapa){alert('Completá la calle, numeración y chapa municipal.');return null;}
   }
   if(o==='ARBA'&&t==='Planos PH'){
     d.partido=gv('ar_part');d.partida=gv('ar_partida');
@@ -1321,6 +1315,7 @@ function generarResumen(){
     if((o==='Catastro GCBA'||o==='Estudio Lavalle')&&t==='Pre-Factibilidad'){
       const d=datos;
       html+=`<div class="resumen-dato"><span class="resumen-label">Dirección</span><span>${d.calle} ${d.numero} CABA</span></div>`;
+      if(d.chapa) html+=`<div class="resumen-dato"><span class="resumen-label">Chapa municipal</span><span>${d.chapa}</span></div>`;
     }
     if(o==='Catastro GCBA'&&t==='Planos'){
       L.push(`  Plano   : ${tr.nro}-${tr.anio}`);
