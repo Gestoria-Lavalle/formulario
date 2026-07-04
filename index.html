@@ -412,12 +412,8 @@ function selOrgPrefactibilidad(el){
   }
   document.querySelectorAll('#step2 .option-card').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
-  S.org='Estudio Lavalle'; S.tipo='Pre-Factibilidad'; S.caracter='Simple';
-  setTimeout(function(){
-    goStep(4);
-    var c=document.getElementById('form-campos');
-    if(c) fPreFactibilidadCABA(c);
-  },200);
+  S.org='Estudio Lavalle'; S.tipo=''; S.caracter='';
+  document.getElementById('btn2').disabled=false;
 }
 
 function selOrg(org,el){
@@ -1321,9 +1317,9 @@ function generarResumen(){
       }
     }
     if((o==='Catastro GCBA'||o==='Estudio Lavalle')&&t==='Pre-Factibilidad'){
-      if(tr.calle||tr.numero) html+=`<div class="resumen-dato"><span class="resumen-label">Dirección</span><span>${tr.calle||''} ${tr.numero||''} CABA</span></div>`;
-      if(tr.chapa) html+=`<div class="resumen-dato"><span class="resumen-label">Chapa municipal</span><span>${tr.chapa}</span></div>`;
-      if(tr.obs) html+=`<div class="resumen-dato"><span class="resumen-label">Observaciones</span><span>${tr.obs}</span></div>`;
+      if(tr.calle||tr.numero) L.push(`  Dirección: ${tr.calle||''} ${tr.numero||''} CABA`);
+      if(tr.chapa) L.push(`  Chapa   : ${tr.chapa}`);
+      if(tr.obs) L.push(`  Obs     : ${tr.obs}`);
     }
     if(o==='Catastro GCBA'&&t==='Planos'){
       L.push(`  Plano   : ${tr.nro}-${tr.anio}`);
