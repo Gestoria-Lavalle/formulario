@@ -413,6 +413,10 @@ function selOrgPrefactibilidad(el){
   document.querySelectorAll('#step2 .option-card').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
   S.org='Estudio Lavalle'; S.tipo='Pre-Factibilidad'; S.caracter='Simple';
+  // Marcar steps 3 y 4 como completados en el stepper
+  document.querySelectorAll('.step-item').forEach(function(s,i){
+    if(i===2||i===3){ s.classList.add('completed'); s.classList.remove('active'); }
+  });
   setTimeout(function(){
     goStep(5);
     var c=document.getElementById('form-campos');
