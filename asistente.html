@@ -780,6 +780,15 @@ function autoResize(el) {
 function handleFile(input) {
   const file = input.files[0];
   if (!file) return;
+
+  const MAX_SIZE_MB = 15;
+  const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+  if (file.size > MAX_SIZE_BYTES) {
+    addMessage('ai', `⚠️ El archivo <strong>${file.name}</strong> es demasiado grande (${(file.size/1024/1024).toFixed(1)} MB). El tamaño máximo permitido es ${MAX_SIZE_MB} MB. Por favor comprimí el archivo o contactanos directamente a <strong>lavalle.garone@gmail.com</strong> o al <strong>11-5645-5934</strong>.`);
+    input.value = '';
+    return;
+  }
+
   pendingFile = file;
   document.getElementById('fileName').textContent = file.name;
   document.getElementById('filePreview').style.display = 'flex';
