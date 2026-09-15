@@ -626,6 +626,8 @@ tbody td {
             <option>RPI-PBA</option>
             <option>Catastro GCBA</option>
             <option>ARBA</option>
+            <option>Protocolos Notariales</option>
+            <option>Estudio Lavalle</option>
           </select>
         </div>
         <div class="filter-group">
@@ -793,6 +795,8 @@ tbody td {
           <option>RPI-PBA</option>
           <option>Catastro GCBA</option>
           <option>ARBA</option>
+          <option>Protocolos Notariales</option>
+          <option>Estudio Lavalle</option>
         </select>
       </div>
       <div class="form-group">
@@ -806,6 +810,8 @@ tbody td {
           <option>Copia de Asiento</option>
           <option>Planos</option>
           <option>Info 6</option>
+          <option>Reglamento de Copropiedad</option>
+          <option>Pre-Factibilidad</option>
         </select>
       </div>
       <div class="form-group">
@@ -973,7 +979,7 @@ function logout(){
 async function loadData(){
   document.getElementById('table-content').innerHTML = '<div class="loading"><div class="spinner"></div>Cargando datos...</div>';
   try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/TRAMITES!A2:Q500?key=${API_KEY}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/TRAMITES!A2:Q?key=${API_KEY}`;
     const r = await fetch(url);
     const data = await r.json();
     const rows = data.values || [];
