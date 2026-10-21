@@ -306,7 +306,7 @@ const PRECIOS = {
   'Catastro GCBA':{'Planos':{Urgente:[25000,40000]},'Cert. Info. Registral':{Simple:[0,0]}},
   'ARBA':{'Planos PH':{Simple:[3658,23000]}},
   'Protocolos Notariales':{'Reglamento de Copropiedad':{Simple:[35000,80000]}},
-  'Estudio Lavalle':{'Pre-Factibilidad':{Simple:[0,50000]}},
+  'Estudio Lavalle':{'Pre-Factibilidad':{Simple:[0,50000]},'Informe Comercial':{Simple:[0,7000]}},
 };
 
 const PARTIDOS=['001-Adolfo Alsina','002-Alberti','003-Almirante Brown','004-Avellaneda','005-Ayacucho','006-Azul','007-Bahía Blanca','008-Balcarce','009-Baradero','010-Arrecifes','011-Bolívar','012-Bragado','013-Cnel. Brandsen','014-Campana','015-Cañuelas','016-Carlos Casares','017-Carlos Tejedor','018-Carmen de Areco','019-Daireaux','020-Castelli','021-Colón','022-Cnel. Dorrego','023-Cnel. Pringles','024-Cnel. Suárez','025-Lanús','026-Chacabuco','027-Chascomús','028-Chivilcoy','029-Dolores','030-Esteban Echeverría','031-Exaltación de la Cruz','032-Florencio Varela','033-Gral. Alvarado','034-Gral. Alvear','035-Gral. Arenales','036-Gral. Belgrano','037-Gral. Guido','038-Zárate','039-Gral. Madariaga','040-Gral. Lamadrid','041-Gral. Las Heras','042-Gral. Lavalle','043-Gral. Paz','044-Gral. Pinto','045-Gral. Pueyrredón','046-Gral. Rodríguez','047-Gral. San Martín','048-Gral. Sarmiento','049-Gral. Viamonte','050-Gral. Villegas','051-Adolfo G. Chaves','052-Guaminí','053-Benito Juárez','054-Junín','055-La Plata','056-Laprida','057-Tigre','058-Las Flores','059-Leandro N. Alem','060-Lincoln','061-Lobería','062-Lobos','063-Lomas de Zamora','064-Luján','065-Magdalena','066-Maipú','067-Salto','068-Marcos Paz','069-Mar Chiquita','070-La Matanza','071-Mercedes','072-Merlo','073-Monte','074-Moreno','075-Navarro','076-Necochea','077-Nueve de Julio','078-Olavarría','079-Patagones','080-Pehuajó','081-Pellegrini','082-Pergamino','083-Pila','084-Pilar','085-Puán','086-Quilmes','087-Ramallo','088-Rauch','089-Rivadavia','090-Rojas','091-Roque Pérez','092-Saavedra','093-Saladillo','094-San Andrés de Giles','095-San Antonio de Areco','096-San Fernando','097-San Isidro','098-San Nicolás','099-San Pedro','100-San Vicente','101-Morón','102-Suipacha','103-Tandil','104-Tapalqué','105-Tordillo','106-Tornquist','107-Trenque Lauquen','108-Tres Arroyos','109-Veinticinco de Mayo','110-Vicente López','111-Villarino','112-Islas','113-Cnel. Rosales','114-Berisso','115-Ensenada','116-San Cayetano','117-Tres de Febrero','118-Escobar','119-Hipólito Yrigoyen','120-Berazategui','121-Capitán Sarmiento','122-Salliqueló','123-De la Costa','124-Pinamar','125-Villa Gesell','126-Monte Hermoso','127-Tres Lomas','128-Florentino Ameghino','129-Presidente Perón','130-Ezeiza','131-San Miguel','132-José C. Paz','133-Malvinas Argentinas','134-Punta Indio','135-Hurlingham','136-Ituzaingó','137-Lezama'];
@@ -488,6 +488,7 @@ function buildStep5(){
   if(o==='Catastro GCBA'&&t==='Planos')fPlanosGCBA(c);
   if(o==='Catastro GCBA'&&t==='Pre-Factibilidad')fPreFactibilidadCABA(c);
   if(o==='Estudio Lavalle'&&t==='Pre-Factibilidad')fPreFactibilidadCABA(c);
+  if(o==='Estudio Lavalle'&&t==='Informe Comercial')fInformeComercialEL(c);
   if(o==='ARBA'&&t==='Planos PH')fPlanosARBA(c);
   if(o==='Protocolos Notariales'&&t==='Reglamento de Copropiedad')fReglamentoCopropiedad(c);
 }
@@ -939,6 +940,35 @@ function fPreFactibilidadCABA(c){
   `;
 }
 
+// ESTUDIO LAVALLE — INFORME COMERCIAL
+function fInformeComercialEL(c){
+  c.innerHTML=`
+  <div class="section-label">Datos de la persona</div>
+  <div class="alert info">ℹ️ El Informe Comercial corresponde a una sola persona. Para consultar otra, agregá un nuevo trámite.</div>
+  <div class="form-grid cols-2" style="margin-bottom:10px">
+    <div class="field"><label>Tipo</label>
+      <select id="ic_tp" onchange="toggleInfComercialEL()"><option value="f">Persona Física</option><option value="j">Persona Jurídica</option></select>
+    </div>
+  </div>
+  <div id="ic_f">
+    <div class="form-grid cols-2" style="margin-bottom:10px">
+      <div class="field required"><label>Apellidos</label><input type="text" id="ic_ap"></div>
+      <div class="field required"><label>Nombres</label><input type="text" id="ic_nom"></div>
+    </div>
+    <div class="form-grid cols-2">
+      <div class="field required"><label>Tipo doc.</label><select id="ic_tdoc"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option></select></div>
+      <div class="field required"><label>Número</label><input type="text" id="ic_ndoc"></div>
+    </div>
+  </div>
+  <div id="ic_j" class="hidden">
+    <div class="form-grid cols-2">
+      <div class="field required"><label>Nombre / Razón Social</label><input type="text" id="ic_rs"></div>
+      <div class="field required"><label>CUIT</label><input type="text" id="ic_cuit"></div>
+    </div>
+  </div>`;
+}
+function toggleInfComercialEL(){const v=gv('ic_tp');document.getElementById('ic_f').classList.toggle('hidden',v!=='f');document.getElementById('ic_j').classList.toggle('hidden',v!=='j');}
+
 function fPlanosGCBA(c){
   c.innerHTML=`
   <div class="section-label">Datos — Sistema TAD GCBA</div>
@@ -1069,6 +1099,14 @@ function collectDatos(){
     d.calle=gv('pf-calle')||''; d.numero=gv('pf-numero')||''; d.chapa=gv('pf-chapa')||'';
     d.obs=gv('pf-obs')||'';
     d.dir=d.calle+' '+d.numero+' CABA';
+  }
+  if(o==='Estudio Lavalle'&&t==='Informe Comercial'){
+    const v=gv('ic_tp');
+    if(v==='f'){
+      d.persona=`${gv('ic_ap')}, ${gv('ic_nom')} — ${gv('ic_tdoc')} ${gv('ic_ndoc')}`;
+    } else {
+      d.persona=`${gv('ic_rs')} — CUIT ${gv('ic_cuit')} (P.J.)`;
+    }
   }
   if(o==='ARBA'&&t==='Planos PH'){
     d.partido=gv('ar_part');d.partida=gv('ar_partida');
